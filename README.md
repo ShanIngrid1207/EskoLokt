@@ -2,6 +2,10 @@
 
 > Trustless cash-on-delivery escrow on Stellar — buyers prepay into a smart contract, sellers get paid the moment delivery is confirmed, and money auto-returns if the parcel bounces back.
 
+## Project Description
+
+COD Lock is a Soroban smart contract on Stellar that escrows cash-on-delivery (COD) orders for Filipino social-commerce sellers. A buyer prepays an order into the contract; the funds stay neutral while the parcel is in transit and can only move in one of two directions — released to the seller once delivery is confirmed, or refunded to the buyer if the parcel is returned. The project ships with the on-chain contract (`create_order`, `confirm_delivery`, `refund_order`, `get_order`), a 5-test suite, and a Vite + React Freighter wallet front-end (in [`web/`](web/)) for connecting a wallet, viewing a Testnet XLM balance, and sending payments.
+
 ## Problem
 
 Joy, a Facebook-page clothing seller in Manila, ships cash-on-delivery parcels through couriers like J&T and loses roughly ₱4,000/week to fake orders and "rejected on delivery" buyers — she has already paid for courier and packaging before learning the order was bogus.
@@ -71,14 +75,13 @@ stellar contract deploy \
 # -> prints the deployed CONTRACT_ID
 ```
 
-## Deployed contract (testnet)
+## Deployed Contract Details
 
-```
-CBHTZBTBBLKR56GO2EICGJTMJE6FUFIXTBMSG4GIMB3NVVXZUBDUPGEN
-```
+- **Network:** Stellar Testnet
+- **Contract ID:** `CBHTZBTBBLKR56GO2EICGJTMJE6FUFIXTBMSG4GIMB3NVVXZUBDUPGEN`
+- **Explorer:** https://stellar.expert/explorer/testnet/contract/CBHTZBTBBLKR56GO2EICGJTMJE6FUFIXTBMSG4GIMB3NVVXZUBDUPGEN
 
-View it on Stellar Expert:
-https://stellar.expert/explorer/testnet/contract/CBHTZBTBBLKR56GO2EICGJTMJE6FUFIXTBMSG4GIMB3NVVXZUBDUPGEN
+![COD Lock contract deployed on Stellar Testnet (block explorer)](contract.png)
 
 ## Sample CLI invocation (the MVP function)
 
