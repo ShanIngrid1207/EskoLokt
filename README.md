@@ -81,7 +81,7 @@ stellar contract deploy \
 - **Contract ID:** `CBHTZBTBBLKR56GO2EICGJTMJE6FUFIXTBMSG4GIMB3NVVXZUBDUPGEN`
 - **Explorer:** https://stellar.expert/explorer/testnet/contract/CBHTZBTBBLKR56GO2EICGJTMJE6FUFIXTBMSG4GIMB3NVVXZUBDUPGEN
 
-![COD Lock contract deployed on Stellar Testnet (block explorer)](contract.png)
+![COD Lock contract deployed on Stellar Testnet (block explorer)](contract-explorer.png)
 
 ## Sample CLI invocation (the MVP function)
 
