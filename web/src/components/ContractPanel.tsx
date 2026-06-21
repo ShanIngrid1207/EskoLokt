@@ -5,10 +5,10 @@ const CONTRACT_ID = "CBHTZBTBBLKR56GO2EICGJTMJE6FUFIXTBMSG4GIMB3NVVXZUBDUPGEN";
 const CONTRACT_URL = `https://stellar.expert/explorer/testnet/contract/${CONTRACT_ID}`;
 
 const FACTS = [
-  { k: "Network", v: "Stellar Testnet" },
-  { k: "Type", v: "WASM contract (Soroban)" },
-  { k: "SDK", v: "soroban-sdk 25" },
-  { k: "What it can do", v: "create order · confirm delivery · refund · look up order" },
+  { k: "Runs on", v: "Stellar (a public network)" },
+  { k: "Status", v: "Live and running" },
+  { k: "Who controls it", v: "No one — it runs on its own" },
+  { k: "What it can do", v: "place an order · confirm delivery · refund · check an order" },
 ];
 
 export function ContractPanel() {
@@ -25,16 +25,11 @@ export function ContractPanel() {
 
   return (
     <div className="contract-view">
-      <p className="demo-intro">
-        This is the actual program running on Stellar that holds each order's money and releases it
-        automatically — no person can touch it in between. You don't need to read the details below;
-        it's here as proof the system is real and live, not just a mock-up.
-      </p>
       <section className="panel">
         <div className="panel-head">
-          <span>Deployed contract</span>
+          <span>The live program</span>
           <a className="view" href={CONTRACT_URL} target="_blank" rel="noreferrer">
-            Stellar Expert <IconExternal size={13} />
+            See it live <IconExternal size={13} />
           </a>
         </div>
 

@@ -38,15 +38,15 @@ export function StellarWalletPanel() {
           Wallet <span className="badge">Safe test</span>
         </h2>
         <p className="demo-intro">
-          This part is optional and just for the curious — it lets you send a pretend payment on
-          Stellar's free test network. No real money is ever involved.
+          This part is optional and just for the curious — it lets you try a pretend payment using
+          free practice money. Nothing real is ever spent.
         </p>
         <p className="warn">
           To try it you'll need the free{" "}
           <a href="https://www.freighter.app/" target="_blank" rel="noreferrer">
-            Freighter wallet
+            Freighter
           </a>{" "}
-          browser add-on, set to <strong>Testnet</strong>.
+          browser add-on, set to its <strong>practice mode</strong>.
         </p>
       </section>
     );
@@ -61,14 +61,14 @@ export function StellarWalletPanel() {
       </h2>
 
       <p className="demo-intro">
-        Optional, just for the curious. This sends a pretend payment on Stellar's free test network —
-        no real money is involved.
+        Optional, just for the curious. It sends a pretend payment using free practice money —
+        nothing real is ever spent.
       </p>
 
       {/* Connection */}
       {!w.isConnected ? (
         <button className="btn primary" onClick={w.connect} disabled={w.isConnecting}>
-          <IconWallet size={18} /> {w.isConnecting ? "Connecting…" : "Connect Freighter Wallet"}
+          <IconWallet size={18} /> {w.isConnecting ? "Connecting…" : "Connect wallet"}
         </button>
       ) : (
         <div className="row between">
@@ -89,7 +89,7 @@ export function StellarWalletPanel() {
       {w.connectError && <p className="error">{w.connectError}</p>}
       {wrongNetwork && (
         <p className="warn">
-          Freighter network is “{w.network}”. Switch it to <strong>Testnet</strong> to use this app.
+          Your wallet is on the wrong network. Switch it to <strong>practice mode</strong> to use this.
         </p>
       )}
 
@@ -98,7 +98,7 @@ export function StellarWalletPanel() {
           {/* Balance */}
           <div className="section">
             <div className="row between">
-              <h3>Balance</h3>
+              <h3>Practice balance</h3>
               <button
                 className="btn ghost sm"
                 onClick={() => w.refreshBalance()}
@@ -108,17 +108,17 @@ export function StellarWalletPanel() {
               </button>
             </div>
 
-            {w.balanceStatus === "loading" && <p className="muted">Loading balance…</p>}
+            {w.balanceStatus === "loading" && <p className="muted">Loading…</p>}
             {w.balanceStatus === "funded" && (
               <p className="balance">
-                {Number(w.balance).toFixed(7)} <span>XLM</span>
+                {Number(w.balance).toFixed(2)} <span>test coins</span>
               </p>
             )}
             {w.balanceStatus === "unfunded" && (
               <p className="warn">
-                Your Testnet account is not funded yet. Fund it with{" "}
+                Your test wallet has no practice coins yet. Get some free from the{" "}
                 <a href="https://friendbot.stellar.org" target="_blank" rel="noreferrer">
-                  Stellar Friendbot
+                  practice faucet
                 </a>
                 , then Refresh.
               </p>
@@ -132,18 +132,18 @@ export function StellarWalletPanel() {
             <h3>Send a test payment</h3>
 
             <label>
-              Destination address
+              Who to pay
               <input
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
-                placeholder="G… recipient public key"
+                placeholder="Paste the other wallet's address"
                 autoComplete="off"
                 spellCheck={false}
               />
             </label>
 
             <label>
-              Amount (XLM)
+              Amount (test coins)
               <input
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
@@ -153,7 +153,7 @@ export function StellarWalletPanel() {
             </label>
 
             <label>
-              Memo (optional)
+              Note (optional)
               <input
                 value={memo}
                 onChange={(e) => setMemo(e.target.value)}
@@ -163,11 +163,11 @@ export function StellarWalletPanel() {
             </label>
 
             <button className="btn primary" type="submit" disabled={w.isSending || !!wrongNetwork}>
-              <IconSend size={18} /> {w.isSending ? "Sending…" : "Send XLM"}
+              <IconSend size={18} /> {w.isSending ? "Sending…" : "Send test payment"}
             </button>
 
             {w.txStatus === "pending" && (
-              <p className="muted">Submitting transaction… confirm signing in Freighter.</p>
+              <p className="muted">Sending… confirm it in your wallet pop-up.</p>
             )}
             {w.txStatus === "success" && w.txHash && (
               <div className="ok">
@@ -175,7 +175,7 @@ export function StellarWalletPanel() {
                   <IconCheck size={18} /> Payment sent.
                 </p>
                 <p className="hash">
-                  Tx:{" "}
+                  Receipt:{" "}
                   <a href={STELLAR_EXPLORER_TX(w.txHash)} target="_blank" rel="noreferrer">
                     {truncate(w.txHash)} <IconExternal size={13} />
                   </a>
