@@ -8,7 +8,7 @@ const FACTS = [
   { k: "Network", v: "Stellar Testnet" },
   { k: "Type", v: "WASM contract (Soroban)" },
   { k: "SDK", v: "soroban-sdk 25" },
-  { k: "Functions", v: "create_order · confirm_delivery · refund_order · get_order" },
+  { k: "What it can do", v: "create order · confirm delivery · refund · look up order" },
 ];
 
 export function ContractPanel() {
@@ -25,6 +25,11 @@ export function ContractPanel() {
 
   return (
     <div className="contract-view">
+      <p className="demo-intro">
+        This is the actual program running on Stellar that holds each order's money and releases it
+        automatically — no person can touch it in between. You don't need to read the details below;
+        it's here as proof the system is real and live, not just a mock-up.
+      </p>
       <section className="panel">
         <div className="panel-head">
           <span>Deployed contract</span>

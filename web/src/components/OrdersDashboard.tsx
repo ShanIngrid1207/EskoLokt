@@ -11,9 +11,9 @@ type StatusTab = "All" | OrderStatus;
 type SortKey = "ts" | "amount" | "settlementMs";
 type SortDir = "asc" | "desc";
 
-const TABS: StatusTab[] = ["All", "Funded", "Released", "Refunded"];
+const TABS: StatusTab[] = ["All", "Held", "Paid", "Refunded"];
 
-const fmtAmount = (n: number) => `${n.toLocaleString("en-US")}`;
+const peso = (n: number) => `₱${n.toLocaleString("en-US")}`;
 const fmtSettle = (ms: number) => (ms === 0 ? "—" : `${(ms / 1000).toFixed(2)}s`);
 
 export function OrdersDashboard() {
@@ -83,8 +83,8 @@ export function OrdersDashboard() {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="ID or address"
-                aria-label="Find order by ID or address"
+                placeholder="Customer name or order #"
+                aria-label="Find order by customer name or order number"
               />
             </div>
           </label>
@@ -118,7 +118,7 @@ export function OrdersDashboard() {
             <section className="panel summary">
               <div className="summary-total">
                 <span className="big">{summary.total}</span>
-                <span className="sub">orders · {fmtAmount(summary.volume)} USDC escrowed</span>
+                <span className="sub">orders · {peso(summary.volume)} held safely</span>
               </div>
               <div className="breakdown-head">
                 <span>STATUS</span>
@@ -160,13 +160,13 @@ export function OrdersDashboard() {
                       Created <span className="caret">{sortCaret("ts")}</span>
                     </th>
                     <th>Order</th>
-                    <th>Buyer → Seller</th>
+                    <th>Customer → Shop</th>
                     <th className="sortable num" onClick={() => toggleSort("amount")}>
                       Amount <span className="caret">{sortCaret("amount")}</span>
                     </th>
                     <th>Status</th>
                     <th className="sortable num" onClick={() => toggleSort("settlementMs")}>
-                      Settlement <span className="caret">{sortCaret("settlementMs")}</span>
+                      Paid in <span className="caret">{sortCaret("settlementMs")}</span>
                     </th>
                     <th aria-label="Actions"></th>
                   </tr>
@@ -178,7 +178,7 @@ export function OrdersDashboard() {
                   {filtered.length === 0 && (
                     <tr>
                       <td colSpan={7} className="empty">
-                        No orders match these filters.
+                        No orders match what you're looking for.
                       </td>
                     </tr>
                   )}
@@ -199,18 +199,18 @@ function OrderRow({ o }: { o: Order }) {
       <td className="mono dim">{o.created}</td>
       <td className="mono">{o.id}</td>
       <td className="parties">
-        <code>{o.buyer}</code>
+        <span className="party">{o.buyer}</span>
         <span className="arrow">→</span>
-        <code>{o.seller}</code>
+        <span className="party">{o.seller}</span>
       </td>
-      <td className="num mono strong">{fmtAmount(o.amount)} USDC</td>
+      <td className="num mono strong">{peso(o.amount)}</td>
       <td>
         <span className={`status-badge ${tone}`}>{o.status}</span>
       </td>
       <td className="num mono dim">{fmtSettle(o.settlementMs)}</td>
       <td className="num">
-        <a className="view" href={CONTRACT_URL} target="_blank" rel="noreferrer" aria-label={`View ${o.id} on Stellar Expert`}>
-          View <IconExternal size={13} />
+        <a className="view" href={CONTRACT_URL} target="_blank" rel="noreferrer" aria-label={`See order ${o.id} receipt on Stellar`}>
+          Receipt <IconExternal size={13} />
         </a>
       </td>
     </tr>

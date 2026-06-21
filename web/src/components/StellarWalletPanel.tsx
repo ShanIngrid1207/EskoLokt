@@ -35,14 +35,18 @@ export function StellarWalletPanel() {
     return (
       <section className="card">
         <h2>
-          Stellar Wallet <span className="badge">Testnet</span>
+          Wallet <span className="badge">Safe test</span>
         </h2>
+        <p className="demo-intro">
+          This part is optional and just for the curious — it lets you send a pretend payment on
+          Stellar's free test network. No real money is ever involved.
+        </p>
         <p className="warn">
-          Freighter wallet is required. Install the{" "}
+          To try it you'll need the free{" "}
           <a href="https://www.freighter.app/" target="_blank" rel="noreferrer">
-            Freighter browser extension
+            Freighter wallet
           </a>{" "}
-          and switch it to <strong>Testnet</strong>.
+          browser add-on, set to <strong>Testnet</strong>.
         </p>
       </section>
     );
@@ -53,8 +57,13 @@ export function StellarWalletPanel() {
   return (
     <section className="card">
       <h2>
-        Stellar Wallet <span className="badge">Testnet</span>
+        Wallet <span className="badge">Safe test</span>
       </h2>
+
+      <p className="demo-intro">
+        Optional, just for the curious. This sends a pretend payment on Stellar's free test network —
+        no real money is involved.
+      </p>
 
       {/* Connection */}
       {!w.isConnected ? (
@@ -120,7 +129,7 @@ export function StellarWalletPanel() {
 
           {/* Send XLM */}
           <form className="section" onSubmit={onSend}>
-            <h3>Send XLM</h3>
+            <h3>Send a test payment</h3>
 
             <label>
               Destination address

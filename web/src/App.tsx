@@ -15,16 +15,28 @@ type View = "orders" | "demo" | "wallet" | "contract";
 
 const NAV: { id: View; label: string; icon: typeof IconGrid }[] = [
   { id: "orders", label: "Orders", icon: IconGrid },
-  { id: "demo", label: "Demo", icon: IconPlay },
+  { id: "demo", label: "Try it", icon: IconPlay },
   { id: "wallet", label: "Wallet", icon: IconWallet },
-  { id: "contract", label: "Contract", icon: IconShield },
+  { id: "contract", label: "Proof", icon: IconShield },
 ];
 
 const TITLES: Record<View, { title: string; sub: string }> = {
-  orders: { title: "Escrow Orders", sub: "Every cash-on-delivery order held by the contract." },
-  demo: { title: "Live Demo", sub: "Walk the escrow flow end to end — simulated, no funds needed." },
-  wallet: { title: "Testnet Wallet", sub: "Connect Freighter, check your balance, send a payment." },
-  contract: { title: "Contract", sub: "The deployed Soroban escrow on Stellar Testnet." },
+  orders: {
+    title: "Orders",
+    sub: "Every order's money is held safely until your customer gets the parcel — then it's released to you.",
+  },
+  demo: {
+    title: "Try it",
+    sub: "Walk through a sample order from start to finish. Nothing real — no money and no wallet needed.",
+  },
+  wallet: {
+    title: "Wallet",
+    sub: "Optional, for the curious. Send a test payment on Stellar's free test network — no real money is involved.",
+  },
+  contract: {
+    title: "Proof it's real",
+    sub: "The live program on Stellar that holds each order's money and releases it automatically. You don't need to understand this part.",
+  },
 };
 
 const REPO_URL = "https://github.com/ShanIngrid1207/CodLock";
