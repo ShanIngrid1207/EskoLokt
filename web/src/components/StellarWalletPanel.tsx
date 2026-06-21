@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useStellarWallet } from "../hooks/useStellarWallet";
 import { STELLAR_EXPLORER_TX } from "../lib/constants";
+import { IconWallet, IconRefresh, IconCopy, IconSend, IconCheck, IconExternal } from "./icons";
 
 function truncate(addr: string) {
   return `${addr.slice(0, 6)}…${addr.slice(-6)}`;
@@ -58,7 +59,7 @@ export function StellarWalletPanel() {
       {/* Connection */}
       {!w.isConnected ? (
         <button className="btn primary" onClick={w.connect} disabled={w.isConnecting}>
-          {w.isConnecting ? "Connecting…" : "Connect Freighter Wallet"}
+          <IconWallet size={18} /> {w.isConnecting ? "Connecting…" : "Connect Freighter Wallet"}
         </button>
       ) : (
         <div className="row between">
@@ -66,6 +67,7 @@ export function StellarWalletPanel() {
             <span className="label">Connected</span>
             <code title={w.publicKey ?? ""}>{w.publicKey ? truncate(w.publicKey) : ""}</code>
             <button className="btn ghost sm" onClick={onCopy}>
+              {copied ? <IconCheck size={14} /> : <IconCopy size={14} />}
               {copied ? "Copied" : "Copy"}
             </button>
           </div>
@@ -93,7 +95,7 @@ export function StellarWalletPanel() {
                 onClick={() => w.refreshBalance()}
                 disabled={w.balanceStatus === "loading"}
               >
-                {w.balanceStatus === "loading" ? "Refreshing…" : "Refresh"}
+                <IconRefresh size={14} /> {w.balanceStatus === "loading" ? "Refreshing…" : "Refresh"}
               </button>
             </div>
 
@@ -152,7 +154,7 @@ export function StellarWalletPanel() {
             </label>
 
             <button className="btn primary" type="submit" disabled={w.isSending || !!wrongNetwork}>
-              {w.isSending ? "Sending…" : "Send XLM"}
+              <IconSend size={18} /> {w.isSending ? "Sending…" : "Send XLM"}
             </button>
 
             {w.txStatus === "pending" && (
@@ -160,11 +162,13 @@ export function StellarWalletPanel() {
             )}
             {w.txStatus === "success" && w.txHash && (
               <div className="ok">
-                <p>✅ Payment sent.</p>
+                <p className="ok-line">
+                  <IconCheck size={18} /> Payment sent.
+                </p>
                 <p className="hash">
                   Tx:{" "}
                   <a href={STELLAR_EXPLORER_TX(w.txHash)} target="_blank" rel="noreferrer">
-                    {truncate(w.txHash)}
+                    {truncate(w.txHash)} <IconExternal size={13} />
                   </a>
                 </p>
               </div>
