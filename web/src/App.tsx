@@ -4,8 +4,10 @@ import { EscrowDemo } from "./components/EscrowDemo";
 import { StellarWalletPanel } from "./components/StellarWalletPanel";
 import { ContractPanel } from "./components/ContractPanel";
 import { EmergencyOptions } from "./components/EmergencyOptions";
+import { HowItWorks } from "./components/HowItWorks";
 import {
   IconGrid,
+  IconInfo,
   IconPlay,
   IconLifebuoy,
   IconWallet,
@@ -13,10 +15,11 @@ import {
   IconBook,
 } from "./components/icons";
 
-type View = "orders" | "demo" | "emergency" | "wallet" | "contract";
+type View = "orders" | "how" | "demo" | "emergency" | "wallet" | "contract";
 
 const NAV: { id: View; label: string; icon: typeof IconGrid }[] = [
   { id: "orders", label: "Orders", icon: IconGrid },
+  { id: "how", label: "How it works", icon: IconInfo },
   { id: "demo", label: "Try it", icon: IconPlay },
   { id: "emergency", label: "Emergency", icon: IconLifebuoy },
   { id: "wallet", label: "Wallet", icon: IconWallet },
@@ -27,6 +30,10 @@ const TITLES: Record<View, { title: string; sub: string }> = {
   orders: {
     title: "Orders",
     sub: "Every order's money is held safely until your customer gets the parcel — then it's released to you.",
+  },
+  how: {
+    title: "How it works",
+    sub: "How COD Lock keeps both the buyer and the seller safe — in plain language.",
   },
   demo: {
     title: "Try it",
@@ -108,6 +115,7 @@ export default function App() {
           </div>
 
           {view === "orders" && <OrdersDashboard />}
+          {view === "how" && <HowItWorks />}
           {view === "demo" && (
             <div className="centered-view">
               <EscrowDemo />
