@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "COD Lock — Stellar Testnet + Freighter wallet UI (Level 1)",
+  "description": "Esko Lokt — Stellar Testnet + Freighter wallet UI (Level 1)",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

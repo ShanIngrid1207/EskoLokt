@@ -1,4 +1,4 @@
-# COD Lock — Web (Stellar Testnet + Freighter)
+# Esko Lokt — Web (Stellar Testnet + Freighter)
 
 A small Vite + React + TypeScript app that satisfies the Stellar **Level 1** wallet
 requirements: connect Freighter, show the connected public key, read the XLM balance

@@ -33,7 +33,7 @@ const TITLES: Record<View, { title: string; sub: string }> = {
   },
   how: {
     title: "How it works",
-    sub: "How COD Lock keeps both the buyer and the seller safe — in plain language.",
+    sub: "How Esko Lokt keeps both the buyer and the seller safe — in plain language.",
   },
   demo: {
     title: "Try it",
@@ -64,7 +64,7 @@ export default function App() {
     <div className="shell">
       {/* Dark rail */}
       <nav className="rail" aria-label="Primary">
-        <div className="rail-logo" title="COD Lock">
+        <div className="rail-logo" title="Esko Lokt">
           <IconShield size={22} />
         </div>
         <div className="rail-items">
@@ -96,7 +96,7 @@ export default function App() {
           <div className="crumbs">
             <span className="crumb org">ShanIngrid1207</span>
             <span className="sep">/</span>
-            <span className="crumb proj">CodLock</span>
+            <span className="crumb proj">esko-lokt</span>
           </div>
           <div className="topbar-right">
             <a className="top-link" href={SITE_URL} target="_blank" rel="noreferrer">

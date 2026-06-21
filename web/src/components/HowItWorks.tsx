@@ -45,12 +45,12 @@ const FAQ = [
     a: "The customer can still pay safely at a nearby counter or by text message. See the Emergency tab.",
   },
   {
-    q: "Where does the money sit — can COD Lock run off with it?",
+    q: "Where does the money sit — can Esko Lokt run off with it?",
     a: "No. No one holds your money, not even us. It sits in a neutral lock and can only move to the seller (delivered) or back to the customer (returned).",
   },
   {
     q: "Isn't this just GCash or Shopee?",
-    a: "Those protect you only inside their own apps. COD Lock works on your own Facebook or Instagram page, and protects both the buyer and the seller.",
+    a: "Those protect you only inside their own apps. Esko Lokt works on your own Facebook or Instagram page, and protects both the buyer and the seller.",
   },
   {
     q: "Do I need to understand crypto?",
@@ -70,7 +70,7 @@ export function HowItWorks() {
   return (
     <div className="how">
       <p className="how-lead">
-        COD Lock makes buying and selling online safe for <strong>both sides</strong>. The moment your
+        Esko Lokt makes buying and selling online safe for <strong>both sides</strong>. The moment your
         customer pays, the money is locked in a neutral safe — and it only moves on real events: it's
         released when they receive the parcel, or refunded if it comes back. No bank, no middleman, and
         no one can run off with it.

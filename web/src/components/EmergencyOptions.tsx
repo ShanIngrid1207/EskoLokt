@@ -57,7 +57,7 @@ function CounterCard() {
       </div>
 
       <p className="opt-text">
-        Your customer brings cash and an order code to a nearby COD&nbsp;Lock counter — a sari-sari
+        Your customer brings cash and an order code to a nearby Esko&nbsp;Lokt counter — a sari-sari
         store or padala agent. The agent locks the money safely for them, just like a remittance
         counter.
       </p>
@@ -149,7 +149,7 @@ function TextCard() {
           )}
           {step === 1 && (
             <div className="ussd">
-              <p className="ussd-title">COD Lock</p>
+              <p className="ussd-title">Esko Lokt</p>
               <p className="ussd-line">Order COD-7F3K · ₱500</p>
               <p className="ussd-line">1. Confirm delivery</p>
               <p className="ussd-line">2. Check status</p>
