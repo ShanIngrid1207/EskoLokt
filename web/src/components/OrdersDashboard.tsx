@@ -118,7 +118,7 @@ export function OrdersDashboard() {
             <section className="panel summary">
               <div className="summary-total">
                 <span className="big">{summary.total}</span>
-                <span className="sub">orders · {peso(summary.volume)} held safely</span>
+                <span className="sub">orders · {peso(summary.volume)} paid on delivery</span>
               </div>
               <div className="breakdown-head">
                 <span>STATUS</span>

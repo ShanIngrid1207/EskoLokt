@@ -12,14 +12,14 @@ Joy, a Facebook-page clothing seller in Manila, ships cash-on-delivery parcels t
 
 ## Solution
 
-The buyer prepays the order into a Soroban escrow at checkout. The contract releases USDC to the seller the instant delivery is confirmed, and refunds the buyer if the parcel is returned — settling in ~5 seconds for sub-cent fees, with no bank or middleman holding the money.
+The customer still pays cash on delivery, like normal COD — they just lock a small **refundable deposit** into a Soroban escrow at checkout. On confirmed delivery the contract returns the deposit to the customer; if the customer refuses or no-shows, the deposit goes to the seller to cover their shipping — settling in ~5 seconds for sub-cent fees, with no bank or middleman. Only the small deposit is ever on-chain; the goods are paid hand-to-hand at the door.
 
 ## Works on weak signal (offline options)
 
 Many Philippine sellers and buyers are in low-connectivity areas, so the app ships an **Emergency** view with two fallbacks a customer can use when data is weak or down:
 
-- **Pay at a counter (agent model).** The customer brings cash and an order code to a nearby COD Lock counter — a sari-sari store or padala agent — who locks the money in escrow for them. Mirrors how OFW remittance counters already work; needs no new tech, just people + incentives.
-- **Pay by text (SMS/USSD).** The customer dials a short code (e.g. `*123*456#`) to confirm an order from any basic phone with no data — the M-Pesa pattern. The app includes a working preview of this flow; a production version connects to a telco / SMS gateway (next-phase backend).
+- **Pay on delivery (rider confirms).** The customer pays cash to the rider at the door — exactly like normal COD, needing no signal at all. The rider (who has signal) enters the customer's one-time delivery code, which confirms delivery and returns the deposit. Nearby agents (a sari-sari store or padala counter) can also lock the small deposit for customers who can't do it online.
+- **Pay by text (SMS/USSD).** The customer dials a short code (e.g. `*123*456#`) to confirm delivery and release the deposit from any basic phone with no data — the M-Pesa pattern. The app includes a working preview of this flow; a production version connects to a telco / SMS gateway (next-phase backend).
 
 The app itself is also a static, cache-friendly build, so the UI and the practice demo load on a single bar of signal. The one thing that always needs a moment of connectivity is broadcasting the signed transaction to the Stellar network — no blockchain can settle fully offline.
 

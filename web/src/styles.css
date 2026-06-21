@@ -19,7 +19,7 @@
   /* text */
   --text: #121826;
   --muted: #586478;
-  --dim: #8b94a6;
+  --dim: #6b7689;
 
   /* brand + semantic */
   --primary: #2f6bff;
@@ -33,9 +33,14 @@
   --danger: #d92d20;
   --danger-soft: #fdeceb;
 
-  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
-  --shadow: 0 4px 16px rgba(16, 24, 40, 0.07);
-  --shadow-lg: 0 16px 40px rgba(16, 24, 40, 0.12);
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08), 0 2px 4px rgba(16, 24, 40, 0.05);
+  --shadow-lg: 0 12px 28px rgba(16, 24, 40, 0.12), 0 4px 8px rgba(16, 24, 40, 0.06);
+
+  /* motion + focus */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ring: 0 0 0 3px var(--primary-soft);
 
   --r-sm: 7px;
   --r: 10px;
@@ -99,8 +104,16 @@ h1 {
   border-radius: 11px;
   background: linear-gradient(140deg, #2f6bff, #5a8bff);
   color: #fff;
-  margin-bottom: 10px;
-  box-shadow: 0 6px 16px rgba(47, 107, 255, 0.45);
+  margin-bottom: 6px;
+  box-shadow: 0 4px 12px rgba(47, 107, 255, 0.32);
+}
+.rail-brand {
+  margin-bottom: 12px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: center;
+  color: var(--rail-text-active);
 }
 .rail-items {
   display: flex;
@@ -214,13 +227,31 @@ h1 {
 .page-head h1 {
   font-size: 26px;
   font-weight: 600;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 .page-head p {
-  margin: 6px 0 0;
+  margin: 7px 0 0;
+  max-width: 72ch;
   color: var(--muted);
+  font-size: 14px;
+  text-wrap: pretty;
 }
 .centered-view {
   max-width: 560px;
+}
+.view-fade {
+  animation: viewIn 220ms var(--ease-out) both;
+}
+@keyframes viewIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* ---------- Tabs ---------- */
@@ -523,11 +554,14 @@ h1 {
   border-bottom: 1px solid var(--surface-2);
   white-space: nowrap;
 }
+.orders-table tbody tr {
+  transition: background 0.12s var(--ease-out);
+}
 .orders-table tbody tr:last-child td {
   border-bottom: none;
 }
 .orders-table tbody tr:hover {
-  background: #fafbfe;
+  background: #f7f9fe;
 }
 .mono {
   font-family: var(--mono);
@@ -775,7 +809,8 @@ h1 {
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.16s ease, border-color 0.16s ease, transform 0.06s ease;
+  transition: background 0.16s var(--ease-out), border-color 0.16s var(--ease-out),
+    box-shadow 0.16s var(--ease-out), transform 0.08s var(--ease-out);
 }
 .btn:active:not(:disabled) {
   transform: translateY(1px);
@@ -799,6 +834,7 @@ h1 {
 }
 .btn.primary:hover:not(:disabled) {
   background: var(--primary-press);
+  box-shadow: 0 2px 8px rgba(47, 107, 255, 0.22);
 }
 .btn.success {
   background: var(--success);
@@ -821,12 +857,26 @@ h1 {
   background: var(--surface-2);
 }
 
+/* ---------- Focus & interaction polish ---------- */
+.tab:focus-visible,
+.chip:focus-visible,
+.view:focus-visible,
+.top-link:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+.rail-item:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.55);
+  outline-offset: -3px;
+}
+
 /* ---------- Escrow demo ---------- */
 .demo-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-xl);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
   padding: 24px;
 }
 .kicker {
@@ -878,6 +928,15 @@ h1 {
   background: var(--surface-2);
   color: var(--muted);
   cursor: not-allowed;
+}
+.deposit-hint {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.deposit-hint strong {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
 }
 .info-dot {
   display: inline-grid;
@@ -1118,7 +1177,7 @@ h1 {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r-xl);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
   padding: 24px;
 }
 .card h2 {
@@ -1213,7 +1272,7 @@ input {
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 input::placeholder {
-  color: #9aa6ba;
+  color: #7b8699;
 }
 input:focus {
   outline: none;
@@ -1508,7 +1567,11 @@ input:focus {
 
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
-  * {
+  *,
+  *::before,
+  *::after {
     transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

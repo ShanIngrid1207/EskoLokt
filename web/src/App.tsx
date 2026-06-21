@@ -29,7 +29,7 @@ const NAV: { id: View; label: string; icon: typeof IconGrid }[] = [
 const TITLES: Record<View, { title: string; sub: string }> = {
   orders: {
     title: "Orders",
-    sub: "Every order's money is held safely until your customer gets the parcel — then it's released to you.",
+    sub: "Customers pay cash on delivery and lock a small refundable deposit — so a fake order never leaves you paying for shipping.",
   },
   how: {
     title: "How it works",
@@ -49,7 +49,7 @@ const TITLES: Record<View, { title: string; sub: string }> = {
   },
   contract: {
     title: "Proof it's real",
-    sub: "The live program on Stellar that holds each order's money and releases it automatically. You don't need to understand this part.",
+    sub: "The live program on Stellar that holds each order's refundable deposit and settles it automatically. You don't need to understand this part.",
   },
 };
 
@@ -67,6 +67,7 @@ export default function App() {
         <div className="rail-logo" title="Esko Lokt">
           <IconShield size={22} />
         </div>
+        <span className="rail-brand">Esko Lokt</span>
         <div className="rail-items">
           {NAV.map((item) => {
             const Icon = item.icon;
@@ -109,25 +110,27 @@ export default function App() {
         </header>
 
         <main className="page">
-          <div className="page-head">
-            <h1>{meta.title}</h1>
-            <p>{meta.sub}</p>
-          </div>
+          <div className="view-fade" key={view}>
+            <div className="page-head">
+              <h1>{meta.title}</h1>
+              <p>{meta.sub}</p>
+            </div>
 
-          {view === "orders" && <OrdersDashboard />}
-          {view === "how" && <HowItWorks />}
-          {view === "demo" && (
-            <div className="centered-view">
-              <EscrowDemo />
-            </div>
-          )}
-          {view === "emergency" && <EmergencyOptions />}
-          {view === "wallet" && (
-            <div className="centered-view">
-              <StellarWalletPanel />
-            </div>
-          )}
-          {view === "contract" && <ContractPanel />}
+            {view === "orders" && <OrdersDashboard />}
+            {view === "how" && <HowItWorks />}
+            {view === "demo" && (
+              <div className="centered-view">
+                <EscrowDemo />
+              </div>
+            )}
+            {view === "emergency" && <EmergencyOptions />}
+            {view === "wallet" && (
+              <div className="centered-view">
+                <StellarWalletPanel />
+              </div>
+            )}
+            {view === "contract" && <ContractPanel />}
+          </div>
         </main>
       </div>
     </div>

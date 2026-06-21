@@ -1,17 +1,10 @@
 import { useState } from "react";
 import { IconStore, IconPhone, IconCheck, IconPin } from "./icons";
 
-// Two offline fallbacks for areas with weak or no signal, written in plain
-// seller language. The counter flow is a real working mini-flow; the text flow
-// is a faithful simulated feature-phone screen (a real version needs a telco /
-// SMS gateway backend — noted in the UI).
-
-const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-function makeCode() {
-  let s = "";
-  for (let i = 0; i < 4; i++) s += CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)];
-  return `COD-${s}`;
-}
+// Two offline fallbacks for areas with weak or no signal, in plain seller
+// language. Cash is paid on delivery (true COD); these flows just confirm
+// delivery and handle the small deposit. The text flow is a faithful simulated
+// feature-phone screen (a real version needs a telco / SMS gateway backend).
 
 const AGENTS = [
   { name: "Aling Nena's Store", dist: "200 m", open: true },
@@ -34,13 +27,13 @@ export function EmergencyOptions() {
   );
 }
 
-/* ---------- Option 1: Pay at a Counter ---------- */
+/* ---------- Option 1: Pay on delivery (rider confirms) ---------- */
 function CounterCard() {
   const [step, setStep] = useState<"idle" | "coded" | "confirmed">("idle");
   const [code, setCode] = useState("");
 
   const generate = () => {
-    setCode(makeCode());
+    setCode(String(Math.floor(1000 + Math.random() * 9000)));
     setStep("coded");
   };
 
@@ -51,45 +44,45 @@ function CounterCard() {
           <IconStore size={22} />
         </span>
         <div>
-          <h2>Pay at a counter</h2>
-          <span className="opt-tag">No internet needed for the customer</span>
+          <h2>Pay on delivery</h2>
+          <span className="opt-tag">Your customer needs no internet at all</span>
         </div>
       </div>
 
       <p className="opt-text">
-        Your customer brings cash and an order code to a nearby Esko&nbsp;Lokt counter — a sari-sari
-        store or padala agent. The agent locks the money safely for them, just like a remittance
-        counter.
+        Your customer pays cash to the rider at the door — exactly like normal COD. The rider has
+        signal, so entering the customer's delivery code settles everything on the spot. Nearby agents
+        can also lock the small deposit for customers who can't do it online.
       </p>
 
       {step === "idle" && (
         <button className="btn primary" onClick={generate}>
-          Generate an order code
+          Generate delivery code
         </button>
       )}
 
       {step !== "idle" && (
         <div className="code-box">
-          <span className="code-label">Show this code + cash to the agent</span>
+          <span className="code-label">Customer shows this to the rider at the door</span>
           <span className="code-value">{code}</span>
         </div>
       )}
 
       {step === "coded" && (
         <button className="btn success" onClick={() => setStep("confirmed")}>
-          <IconCheck size={18} /> Agent confirms payment
+          <IconCheck size={18} /> Rider confirms delivery
         </button>
       )}
 
       {step === "confirmed" && (
         <p className="result success opt-result">
-          <IconCheck size={18} /> Counter confirmed — the ₱500 is now <strong>Held safely</strong>{" "}
-          until delivery.
+          <IconCheck size={18} /> Delivered — you got paid in cash, and the deposit went back to your
+          customer.
         </p>
       )}
 
       <div className="agents">
-        <span className="agents-title">Nearby counters</span>
+        <span className="agents-title">Nearby agents</span>
         <ul>
           {AGENTS.map((a) => (
             <li key={a.name}>
@@ -134,8 +127,8 @@ function TextCard() {
       </div>
 
       <p className="opt-text">
-        No signal for data but still has a text line? Your customer dials a short code to confirm the
-        order — the same way GCash or M-Pesa work on basic phones.
+        No signal for data but still has a text line? Your customer dials a short code to confirm
+        delivery and get their deposit back — the same way GCash or M-Pesa work on basic phones.
       </p>
 
       {/* Simulated feature-phone screen */}
@@ -158,8 +151,8 @@ function TextCard() {
           )}
           {step === 2 && (
             <div className="ussd">
-              <p className="ussd-ok">✓ Confirmed</p>
-              <p className="ussd-line">₱500 released to Joy's Closet.</p>
+              <p className="ussd-ok">✓ Delivered</p>
+              <p className="ussd-line">Your ₱50 deposit was returned.</p>
               <p className="ussd-line dim">Ref: COD-7F3K</p>
             </div>
           )}

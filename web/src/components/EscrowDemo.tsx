@@ -8,32 +8,33 @@ import {
   IconArrowRight,
 } from "./icons";
 
-// A fully simulated walkthrough written in a seller's language — no wallet, no
-// real money. It mirrors the real contract flow (create order -> confirm
-// delivery | refund) but never says so to the user: they just create a sample
-// order and watch the money stay safe until the parcel is delivered.
+// A fully simulated walkthrough in plain seller language — no wallet, no real
+// money. Real cash-on-delivery: the customer pays cash at the door. The only
+// thing locked up front is a small REFUNDABLE deposit that protects the seller's
+// shipping if the customer flakes. Delivery is proven by a code the customer
+// hands the rider at the door (works with no internet).
 
-type DemoState = "idle" | "held" | "paid" | "refunded";
+type DemoState = "idle" | "held" | "delivered" | "kept";
 
 const STATUS: Record<DemoState, { label: string; tone: string }> = {
   idle: { label: "Empty", tone: "neutral" },
-  held: { label: "Held safely", tone: "info" },
-  paid: { label: "Paid out", tone: "success" },
-  refunded: { label: "Refunded", tone: "warn" },
+  held: { label: "Deposit held", tone: "info" },
+  delivered: { label: "Delivered", tone: "success" },
+  kept: { label: "Deposit kept", tone: "warn" },
 };
 
 const peso = (n: number) => `₱${n.toLocaleString("en-US")}`;
+// Small, refundable deposit: ~10% of the order, rounded to ₱10, minimum ₱20.
+const depositFor = (amount: number) => Math.max(20, Math.round((amount * 0.1) / 10) * 10);
 
 export function EscrowDemo() {
   const [state, setState] = useState<DemoState>("idle");
   const [customer, setCustomer] = useState("");
   const [amount, setAmount] = useState("500");
-  // The order details are locked in the moment the order is created, so later
-  // steps keep showing the same name/amount even if the inputs were cleared.
-  const [order, setOrder] = useState<{ name: string; amount: number } | null>(null);
+  // Order details are locked in when the order is created.
+  const [order, setOrder] = useState<{ name: string; amount: number; deposit: number } | null>(null);
   const [log, setLog] = useState<{ tag: string; text: string }[]>([]);
-  // The handover code: the customer's one-time code that the rider must enter at
-  // the door to release the money — proof the parcel actually reached them.
+  // Delivery code the customer hands the rider at the door — proof they got it.
   const [code, setCode] = useState("");
   const [codeInput, setCodeInput] = useState("");
   const [codeError, setCodeError] = useState(false);
@@ -44,11 +45,12 @@ export function EscrowDemo() {
   const push = (tag: string, text: string) => setLog((l) => [...l, { tag, text }]);
 
   const name = order?.name || "your customer";
-  const money = order ? peso(order.amount) : "";
+  const goods = order ? peso(order.amount) : "";
+  const dep = order ? peso(order.deposit) : "";
 
   const create = () => {
     if (!amountValid) return;
-    const o = { name: customer.trim() || "your customer", amount: amountNum };
+    const o = { name: customer.trim() || "your customer", amount: amountNum, deposit: depositFor(amountNum) };
     const newCode = String(Math.floor(1000 + Math.random() * 9000));
     setOrder(o);
     setCode(newCode);
@@ -56,25 +58,28 @@ export function EscrowDemo() {
     setCodeError(false);
     setState("held");
     push(
-      "Order created",
-      `${o.name} paid ${peso(o.amount)} up front — it's now held safely. Their delivery code is ${newCode}.`,
+      "Order placed",
+      `${o.name} will pay ${peso(o.amount)} cash on delivery, and locked a ${peso(o.deposit)} refundable deposit. Delivery code: ${newCode}.`,
     );
   };
-  // Release the money only if the rider entered the customer's delivery code.
+  // Confirm delivery only if the rider enters the customer's delivery code.
   const tryDeliver = () => {
     if (state !== "held") return;
     if (codeInput.trim() !== code) {
       setCodeError(true);
       return;
     }
-    setState("paid");
-    push("Delivered", `${name} gave the rider the right code — delivery confirmed, ${money} released to you.`);
-  };
-  const refund = () => {
-    setState("refunded");
+    setState("delivered");
     push(
-      "Refunded",
-      `${name} reported a problem and sent the parcel back. The courier confirmed the return, so ${money} was refunded automatically — no arguing, no chasing.`,
+      "Delivered",
+      `${name} gave the rider the right code and paid ${goods} cash at the door. Their ${dep} deposit was returned.`,
+    );
+  };
+  const noShow = () => {
+    setState("kept");
+    push(
+      "Didn't accept",
+      `${name} refused / didn't show for the parcel. Their ${dep} deposit covered your shipping — you lost nothing.`,
     );
   };
   const reset = () => {
@@ -86,8 +91,11 @@ export function EscrowDemo() {
     setLog([]);
   };
 
-  // Where the "money" chip sits, and its colour.
-  const coinAt = state === "paid" ? "seller" : state === "held" ? "escrow" : "buyer";
+  // The chip represents the DEPOSIT. It returns to the customer on delivery,
+  // or moves to the seller if the customer doesn't accept.
+  const coinAt = state === "kept" ? "seller" : state === "held" ? "escrow" : "buyer";
+  // In both outcomes the seller wins, so highlight "You" when settled.
+  const sellerActive = state === "delivered" || state === "kept";
   const status = STATUS[state];
 
   return (
@@ -103,12 +111,12 @@ export function EscrowDemo() {
       </div>
 
       <p className="demo-intro">
-        Try it: enter a customer and amount, then create the order. The money stays locked and safe —
-        it's only released when your customer enters their delivery code at the door, and it comes
-        back to them automatically if there's a problem.
+        Real cash-on-delivery: your customer pays cash <strong>when the parcel arrives</strong>. They
+        just lock a small <strong>refundable deposit</strong> up front — so a fake order can never
+        leave you paying for shipping again.
       </p>
 
-      {/* Order details — editable only before the order is created */}
+      {/* Order details — editable only before the order is placed */}
       <div className="demo-form">
         <label>
           Customer name
@@ -121,7 +129,7 @@ export function EscrowDemo() {
           />
         </label>
         <label>
-          Order amount (₱)
+          Order amount (₱, paid on delivery)
           <input
             value={amount}
             onChange={(e) => setAmount(e.target.value.replace(/[^\d]/g, ""))}
@@ -132,9 +140,15 @@ export function EscrowDemo() {
         </label>
       </div>
 
-      {/* Pipeline: Customer -> Held safely -> You */}
+      {amountValid && state === "idle" && (
+        <p className="deposit-hint">
+          Refundable deposit for this order: <strong>{peso(depositFor(amountNum))}</strong>
+        </p>
+      )}
+
+      {/* Pipeline: Customer -> Deposit held -> You */}
       <div className={`pipeline state-${state}`}>
-        <div className={`node ${state !== "idle" && coinAt === "buyer" ? "active" : ""}`}>
+        <div className={`node ${state === "delivered" ? "active" : ""}`}>
           <span className="node-icon buyer">
             <IconBuyer size={22} />
           </span>
@@ -151,12 +165,12 @@ export function EscrowDemo() {
             <IconEscrow size={22} />
           </span>
           <span className="node-name">
-            Held safely
+            Deposit held
             <span
               className="info-dot"
               tabIndex={0}
               role="note"
-              title="The money waits in a neutral lock. Neither you nor your customer can spend it until delivery is settled — no bank or middleman holds it."
+              title="Only a small refundable deposit sits in a neutral lock — not the order amount. It returns to your customer on delivery, or covers your shipping if they don't accept. No bank or middleman holds it."
             >
               ?
             </span>
@@ -168,7 +182,7 @@ export function EscrowDemo() {
           <IconArrowRight size={18} />
         </div>
 
-        <div className={`node ${state === "paid" ? "active" : ""}`}>
+        <div className={`node ${sellerActive ? "active" : ""}`}>
           <span className="node-icon seller">
             <IconSeller size={22} />
           </span>
@@ -176,37 +190,38 @@ export function EscrowDemo() {
           <span className="node-sub">the seller</span>
         </div>
 
-        {/* The moving money chip */}
+        {/* The moving deposit chip */}
         <div className={`coin at-${coinAt} ${state === "idle" ? "hidden" : ""} tone-${status.tone}`}>
-          {money}
+          {dep} deposit
         </div>
       </div>
 
       {/* Result / status line (announced to screen readers) */}
       <div className="result-wrap" aria-live="polite">
         {state === "idle" && (
-          <p className="result neutral">Fill in the order above, then press “Create the order”.</p>
+          <p className="result neutral">Fill in the order above, then press “Place the order”.</p>
         )}
         {state === "held" && (
           <p className="result info">
-            <IconEscrow size={18} /> {money} from {name} is held safely — yours to claim once they
-            receive the parcel and are happy with it.
+            <IconEscrow size={18} /> {name} locked a {dep} deposit. They'll pay {goods} cash when the
+            parcel arrives — the deposit just protects your shipping.
           </p>
         )}
-        {state === "paid" && (
+        {state === "delivered" && (
           <p className="result success">
-            <IconCheck size={18} /> Delivered. You received {money}.
+            <IconCheck size={18} /> Delivered. You got {goods} cash at the door, and {name}'s {dep}{" "}
+            deposit was returned. Zero risk to you.
           </p>
         )}
-        {state === "refunded" && (
+        {state === "kept" && (
           <p className="result warn">
-            <IconRefund size={18} /> {name} got {money} back. Because the money was locked the whole
-            time, the refund was automatic and safe — no one had to be trusted.
+            <IconRefund size={18} /> {name} didn't accept the parcel. Their {dep} deposit covered your
+            shipping — you lost nothing.
           </p>
         )}
       </div>
 
-      {/* Handover step — release is tied to the customer's delivery code */}
+      {/* Handover step — delivery is proven by the customer's code */}
       {state === "held" && (
         <div className="handover">
           <div className="handover-code">
@@ -214,8 +229,8 @@ export function EscrowDemo() {
             <span className="code-chip">{code}</span>
           </div>
           <p className="handover-hint">
-            Your customer shows this code to the rider at the door. Entering it confirms they really
-            got the parcel — and it works even with no internet.
+            Your customer shows this code to the rider at the door and pays the {goods} cash. Entering
+            it confirms delivery — and it works even with no internet.
           </p>
           <label>
             Rider enters the code
@@ -231,7 +246,7 @@ export function EscrowDemo() {
             />
           </label>
           {codeError && (
-            <p className="error">That code doesn't match — the money stays safely held.</p>
+            <p className="error">That code doesn't match — the deposit stays safely held.</p>
           )}
         </div>
       )}
@@ -244,27 +259,27 @@ export function EscrowDemo() {
           disabled={state !== "idle" || !amountValid}
           title={!amountValid ? "Enter an order amount first" : undefined}
         >
-          Create the order
+          Place the order
         </button>
         <button
           className="btn success"
           onClick={tryDeliver}
           disabled={state !== "held"}
-          title={state !== "held" ? "Create an order first" : "Confirm with the customer's delivery code"}
+          title={state !== "held" ? "Place an order first" : "Confirm with the customer's delivery code"}
         >
           <IconCheck size={18} /> Confirm delivery
         </button>
         <button
           className="btn warnbtn"
-          onClick={refund}
+          onClick={noShow}
           disabled={state !== "held"}
           title={
             state !== "held"
-              ? "Available while the money is held — before it's released to you"
-              : "Customer reports a problem and returns the parcel"
+              ? "Available while the deposit is held"
+              : "Customer refuses or doesn't show for the parcel"
           }
         >
-          <IconRefund size={18} /> Report a problem
+          <IconRefund size={18} /> Customer didn't accept
         </button>
         <button className="btn ghost" onClick={reset} disabled={state === "idle"}>
           Start over

@@ -8,45 +8,45 @@ const STEPS = [
   {
     icon: IconBuyer,
     tone: "blue",
-    title: "Customer pays up front",
-    text: "At checkout the money goes straight into a neutral safe — not to the seller yet.",
+    title: "Customer locks a small deposit",
+    text: "At checkout the customer locks a small, refundable deposit — not the full price. They'll pay cash when the parcel arrives.",
   },
   {
     icon: IconEscrow,
     tone: "indigo",
-    title: "Money is held safely",
-    text: "Nobody can touch it — not the seller, not the customer, not even us — while the parcel is on the way.",
+    title: "Deposit held safely",
+    text: "Only that small deposit sits in a neutral safe while the parcel is on the way. Nobody can touch it — not the seller, not the customer, not even us.",
   },
   {
     icon: IconCheck,
     tone: "green",
-    title: "Delivered → seller paid",
-    text: "The customer enters their one-time code at the door. That releases the money to the seller.",
+    title: "Delivered → deposit returned",
+    text: "The customer pays cash at the door and gives the rider a one-time code. That confirms delivery and returns their deposit.",
   },
   {
     icon: IconRefund,
     tone: "amber",
-    title: "Problem → customer refunded",
-    text: "If the parcel is returned, the refund is automatic. No arguing, no chasing.",
+    title: "No-show → covers your shipping",
+    text: "If the customer refuses or never shows, the deposit goes to the seller — so a fake order can't leave you paying for shipping.",
   },
 ];
 
 const FAQ = [
   {
     q: "What if the item is bad or wrong?",
-    a: "Within a short check period the customer can return it. Once the courier confirms it came back, the refund happens automatically — no one has to argue about who's right.",
+    a: "Because it's cash on delivery, your customer inspects the parcel at the door before handing over any cash. If it's wrong, they simply don't pay — and an honest no-accept returns the deposit too.",
   },
   {
     q: "Who decides the parcel was really delivered?",
-    a: "The customer does — they give the rider a one-time code at the door. Without that code the money stays locked, so a seller can't fake a delivery.",
+    a: "The customer does — they give the rider a one-time code at the door. Without that code the deposit can't be settled, so a seller can't fake a delivery.",
   },
   {
     q: "What if there's no internet?",
-    a: "The customer can still pay safely at a nearby counter or by text message. See the Emergency tab.",
+    a: "The customer pays cash to the rider as usual — no signal needed. Confirming delivery and the deposit can also be done at a nearby agent or by text. See the Emergency tab.",
   },
   {
     q: "Where does the money sit — can Esko Lokt run off with it?",
-    a: "No. No one holds your money, not even us. It sits in a neutral lock and can only move to the seller (delivered) or back to the customer (returned).",
+    a: "No. The cash for the goods is paid hand-to-hand on delivery — it never touches us. Only the small deposit sits in a neutral lock, and it can only go back to the customer (delivered) or to the seller (refused).",
   },
   {
     q: "Isn't this just GCash or Shopee?",
@@ -59,21 +59,21 @@ const FAQ = [
 ];
 
 const BADGES = [
+  "Pay cash on delivery",
   "No one holds your money",
-  "Automatic refunds",
+  "Deposit auto-returns",
   "Works offline",
   "No crypto needed",
-  "Free to try",
 ];
 
 export function HowItWorks() {
   return (
     <div className="how">
       <p className="how-lead">
-        Esko Lokt makes buying and selling online safe for <strong>both sides</strong>. The moment your
-        customer pays, the money is locked in a neutral safe — and it only moves on real events: it's
-        released when they receive the parcel, or refunded if it comes back. No bank, no middleman, and
-        no one can run off with it.
+        Esko Lokt makes buying and selling online safe for <strong>both sides</strong> — without
+        changing how cash-on-delivery already works. Your customer still pays cash when the parcel
+        arrives. They just lock a small <strong>refundable deposit</strong> first, so a fake order can
+        never leave you paying for shipping. No bank, no middleman, and no one can run off with it.
       </p>
 
       <div className="hiw-steps">
