@@ -31,7 +31,7 @@ const REPO_URL = "https://github.com/ShanIngrid1207/CodLock";
 const SITE_URL = "https://shaningrid1207.github.io/CodLock/";
 
 export default function App() {
-  const [view, setView] = useState<View>("guide");
+  const [view, setView] = useState<View>("orders");
   const meta = TITLES[view];
 
   return (
