@@ -54,7 +54,10 @@ export function EscrowDemo() {
   };
   const refund = () => {
     setState("refunded");
-    push("Refunded", `Parcel came back — ${money} was returned to ${name}.`);
+    push(
+      "Refunded",
+      `${name} reported a problem and sent the parcel back. The courier confirmed the return, so ${money} was refunded automatically — no arguing, no chasing.`,
+    );
   };
   const reset = () => {
     setState("idle");
@@ -164,8 +167,8 @@ export function EscrowDemo() {
         )}
         {state === "held" && (
           <p className="result info">
-            <IconEscrow size={18} /> {money} from {name} is held safely — yours to claim once the
-            parcel is delivered.
+            <IconEscrow size={18} /> {money} from {name} is held safely — yours to claim once they
+            receive the parcel and are happy with it.
           </p>
         )}
         {state === "paid" && (
@@ -175,7 +178,8 @@ export function EscrowDemo() {
         )}
         {state === "refunded" && (
           <p className="result warn">
-            <IconRefund size={18} /> Parcel returned. {name} was refunded {money} — you lost nothing.
+            <IconRefund size={18} /> {name} got {money} back. Because the money was locked the whole
+            time, the refund was automatic and safe — no one had to be trusted.
           </p>
         )}
       </div>
@@ -202,9 +206,13 @@ export function EscrowDemo() {
           className="btn warnbtn"
           onClick={refund}
           disabled={state !== "held"}
-          title={state !== "held" ? "Only available while the money is held" : undefined}
+          title={
+            state !== "held"
+              ? "Available while the money is held — before it's released to you"
+              : "Customer reports a problem and returns the parcel"
+          }
         >
-          <IconRefund size={18} /> Refund the customer
+          <IconRefund size={18} /> Report a problem
         </button>
         <button className="btn ghost" onClick={reset} disabled={state === "idle"}>
           Start over
