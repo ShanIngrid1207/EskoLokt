@@ -1,27 +1,15 @@
 import { useState } from "react";
 import { OrdersDashboard } from "./components/OrdersDashboard";
-import { EscrowDemo } from "./components/EscrowDemo";
+import { GuideView } from "./components/GuideView";
 import { StellarWalletPanel } from "./components/StellarWalletPanel";
 import { ContractPanel } from "./components/ContractPanel";
-import { EmergencyOptions } from "./components/EmergencyOptions";
-import { HowItWorks } from "./components/HowItWorks";
-import {
-  IconGrid,
-  IconInfo,
-  IconPlay,
-  IconLifebuoy,
-  IconWallet,
-  IconShield,
-  IconBook,
-} from "./components/icons";
+import { IconGrid, IconInfo, IconWallet, IconShield, IconBook } from "./components/icons";
 
-type View = "orders" | "how" | "demo" | "emergency" | "wallet" | "contract";
+type View = "orders" | "guide" | "wallet" | "contract";
 
 const NAV: { id: View; label: string; icon: typeof IconGrid }[] = [
   { id: "orders", label: "Orders", icon: IconGrid },
-  { id: "how", label: "How it works", icon: IconInfo },
-  { id: "demo", label: "Try it", icon: IconPlay },
-  { id: "emergency", label: "Emergency", icon: IconLifebuoy },
+  { id: "guide", label: "How it works", icon: IconInfo },
   { id: "wallet", label: "Wallet", icon: IconWallet },
   { id: "contract", label: "Proof", icon: IconShield },
 ];
@@ -31,17 +19,9 @@ const TITLES: Record<View, { title: string; sub: string }> = {
     title: "Orders",
     sub: "Customers pay cash on delivery and lock a small refundable deposit — so a fake order never leaves you paying for shipping.",
   },
-  how: {
+  guide: {
     title: "How it works",
-    sub: "How Esko Lokt keeps both the buyer and the seller safe — in plain language.",
-  },
-  demo: {
-    title: "Try it",
-    sub: "Walk through a sample order from start to finish. Nothing real — no money and no wallet needed.",
-  },
-  emergency: {
-    title: "No signal? No problem",
-    sub: "Two ways your customer can still pay safely when the internet is weak or down.",
+    sub: "See how Esko Lokt protects every sale — read the overview, try a sample order, or check the offline options.",
   },
   wallet: {
     title: "Wallet",
@@ -117,13 +97,7 @@ export default function App() {
             </div>
 
             {view === "orders" && <OrdersDashboard />}
-            {view === "how" && <HowItWorks />}
-            {view === "demo" && (
-              <div className="centered-view">
-                <EscrowDemo />
-              </div>
-            )}
-            {view === "emergency" && <EmergencyOptions />}
+            {view === "guide" && <GuideView />}
             {view === "wallet" && (
               <div className="centered-view">
                 <StellarWalletPanel />
