@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { OrdersDashboard } from "./components/OrdersDashboard";
 import { GuideView } from "./components/GuideView";
-import { StellarWalletPanel } from "./components/StellarWalletPanel";
-import { ContractPanel } from "./components/ContractPanel";
-import { IconGrid, IconInfo, IconWallet, IconShield, IconBook } from "./components/icons";
+import { ProofView } from "./components/ProofView";
+import { IconGrid, IconInfo, IconShield, IconBook } from "./components/icons";
 
-type View = "orders" | "guide" | "wallet" | "contract";
+type View = "orders" | "guide" | "proof";
 
 const NAV: { id: View; label: string; icon: typeof IconGrid }[] = [
   { id: "orders", label: "Orders", icon: IconGrid },
   { id: "guide", label: "How it works", icon: IconInfo },
-  { id: "wallet", label: "Wallet", icon: IconWallet },
-  { id: "contract", label: "Proof", icon: IconShield },
+  { id: "proof", label: "Proof", icon: IconShield },
 ];
 
 const TITLES: Record<View, { title: string; sub: string }> = {
@@ -23,13 +21,9 @@ const TITLES: Record<View, { title: string; sub: string }> = {
     title: "How it works",
     sub: "See how Esko Lokt protects every sale — read the overview, try a sample order, or check the offline options.",
   },
-  wallet: {
-    title: "Wallet",
-    sub: "Optional, for the curious. Send a test payment on Stellar's free test network — no real money is involved.",
-  },
-  contract: {
+  proof: {
     title: "Proof it's real",
-    sub: "The live program on Stellar that holds each order's refundable deposit and settles it automatically. You don't need to understand this part.",
+    sub: "The live program on Stellar that settles every sale automatically. If you're curious, you can also try a real payment yourself — no real money involved.",
   },
 };
 
@@ -37,7 +31,7 @@ const REPO_URL = "https://github.com/ShanIngrid1207/CodLock";
 const SITE_URL = "https://shaningrid1207.github.io/CodLock/";
 
 export default function App() {
-  const [view, setView] = useState<View>("orders");
+  const [view, setView] = useState<View>("guide");
   const meta = TITLES[view];
 
   return (
@@ -98,12 +92,7 @@ export default function App() {
 
             {view === "orders" && <OrdersDashboard />}
             {view === "guide" && <GuideView />}
-            {view === "wallet" && (
-              <div className="centered-view">
-                <StellarWalletPanel />
-              </div>
-            )}
-            {view === "contract" && <ContractPanel />}
+            {view === "proof" && <ProofView />}
           </div>
         </main>
       </div>

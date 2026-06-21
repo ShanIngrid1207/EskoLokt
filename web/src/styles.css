@@ -1312,6 +1312,59 @@ input:focus {
   gap: 4px;
 }
 
+/* ---------- Guide layout (overview + demo + offline side by side) ---------- */
+.guide-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 440px;
+  gap: 26px;
+  align-items: start;
+}
+.guide-main {
+  min-width: 0;
+}
+.guide-main .how {
+  max-width: none;
+}
+.guide-main .contract-view {
+  max-width: none;
+}
+.guide-side {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+.guide-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.guide-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+/* the right column is narrow, so stack the two offline cards */
+.guide-side .emergency {
+  max-width: none;
+}
+.guide-side .emergency-intro {
+  display: none;
+}
+.guide-side .emergency-grid {
+  grid-template-columns: 1fr;
+}
+@media (max-width: 1080px) {
+  .guide-layout {
+    grid-template-columns: 1fr;
+  }
+  .guide-side {
+    max-width: 620px;
+  }
+}
+
 /* ---------- Emergency / offline options ---------- */
 .emergency {
   max-width: 940px;

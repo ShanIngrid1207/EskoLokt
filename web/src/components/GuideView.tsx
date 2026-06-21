@@ -1,48 +1,28 @@
-import { useState } from "react";
 import { HowItWorks } from "./HowItWorks";
 import { EscrowDemo } from "./EscrowDemo";
 import { EmergencyOptions } from "./EmergencyOptions";
 
-// Combines the three "understand the product" sections — the plain-language
-// overview, the interactive demo, and the offline options — under one nav item
-// with internal sub-tabs, so the rail stays short.
-
-type Tab = "overview" | "demo" | "offline";
-
-const TABS: { id: Tab; label: string }[] = [
-  { id: "overview", label: "Overview" },
-  { id: "demo", label: "Try it" },
-  { id: "offline", label: "No signal" },
-];
+// One "understand the product" page: the plain-language overview on the left,
+// with the interactive demo and the offline options stacked on the right so the
+// wide space is used instead of hidden behind tabs.
 
 export function GuideView() {
-  const [tab, setTab] = useState<Tab>("overview");
-
   return (
-    <div className="guide">
-      <div className="tabstrip" role="tablist" aria-label="How it works">
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            role="tab"
-            aria-selected={tab === t.id}
-            className={`tab ${tab === t.id ? "active" : ""}`}
-            onClick={() => setTab(t.id)}
-          >
-            {t.label}
-          </button>
-        ))}
+    <div className="guide-layout">
+      <div className="guide-main">
+        <HowItWorks />
       </div>
 
-      <div className="view-fade" key={tab}>
-        {tab === "overview" && <HowItWorks />}
-        {tab === "demo" && (
-          <div className="centered-view">
-            <EscrowDemo />
-          </div>
-        )}
-        {tab === "offline" && <EmergencyOptions />}
-      </div>
+      <aside className="guide-side">
+        <div className="guide-block">
+          <span className="guide-kicker">Try it yourself</span>
+          <EscrowDemo />
+        </div>
+        <div className="guide-block">
+          <span className="guide-kicker">No signal? No problem</span>
+          <EmergencyOptions />
+        </div>
+      </aside>
     </div>
   );
 }
