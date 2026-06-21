@@ -162,3 +162,35 @@ export const IconSort = (p: IconProps) => (
     <path d="m20 17-4 4-4-4" />
   </Base>
 );
+
+export const IconLifebuoy = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <circle cx="12" cy="12" r="3.5" />
+    <path d="m5 5 3.5 3.5M15.5 15.5 19 19M19 5l-3.5 3.5M8.5 15.5 5 19" />
+  </Base>
+);
+
+export const IconPhone = (p: IconProps) => (
+  <Base {...p}>
+    <rect x="6.5" y="2.5" width="11" height="19" rx="2.5" />
+    <path d="M10 5.5h4" />
+    <circle cx="12" cy="18" r="0.9" fill="currentColor" stroke="none" />
+  </Base>
+);
+
+export const IconStore = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M4 9l1-4h14l1 4" />
+    <path d="M4 9a2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0 2.5 2.5 0 0 0 5 0" />
+    <path d="M5 10v9h14v-9" />
+    <path d="M9 19v-5h4v5" />
+  </Base>
+);
+
+export const IconPin = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11z" />
+    <circle cx="12" cy="10" r="2.5" />
+  </Base>
+);

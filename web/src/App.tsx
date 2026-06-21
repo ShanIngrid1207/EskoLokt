@@ -3,19 +3,22 @@ import { OrdersDashboard } from "./components/OrdersDashboard";
 import { EscrowDemo } from "./components/EscrowDemo";
 import { StellarWalletPanel } from "./components/StellarWalletPanel";
 import { ContractPanel } from "./components/ContractPanel";
+import { EmergencyOptions } from "./components/EmergencyOptions";
 import {
   IconGrid,
   IconPlay,
+  IconLifebuoy,
   IconWallet,
   IconShield,
   IconBook,
 } from "./components/icons";
 
-type View = "orders" | "demo" | "wallet" | "contract";
+type View = "orders" | "demo" | "emergency" | "wallet" | "contract";
 
 const NAV: { id: View; label: string; icon: typeof IconGrid }[] = [
   { id: "orders", label: "Orders", icon: IconGrid },
   { id: "demo", label: "Try it", icon: IconPlay },
+  { id: "emergency", label: "Emergency", icon: IconLifebuoy },
   { id: "wallet", label: "Wallet", icon: IconWallet },
   { id: "contract", label: "Proof", icon: IconShield },
 ];
@@ -28,6 +31,10 @@ const TITLES: Record<View, { title: string; sub: string }> = {
   demo: {
     title: "Try it",
     sub: "Walk through a sample order from start to finish. Nothing real — no money and no wallet needed.",
+  },
+  emergency: {
+    title: "No signal? No problem",
+    sub: "Two ways your customer can still pay safely when the internet is weak or down.",
   },
   wallet: {
     title: "Wallet",
@@ -106,6 +113,7 @@ export default function App() {
               <EscrowDemo />
             </div>
           )}
+          {view === "emergency" && <EmergencyOptions />}
           {view === "wallet" && (
             <div className="centered-view">
               <StellarWalletPanel />
