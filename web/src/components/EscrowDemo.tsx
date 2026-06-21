@@ -32,6 +32,11 @@ export function EscrowDemo() {
   // steps keep showing the same name/amount even if the inputs were cleared.
   const [order, setOrder] = useState<{ name: string; amount: number } | null>(null);
   const [log, setLog] = useState<{ tag: string; text: string }[]>([]);
+  // The handover code: the customer's one-time code that the rider must enter at
+  // the door to release the money — proof the parcel actually reached them.
+  const [code, setCode] = useState("");
+  const [codeInput, setCodeInput] = useState("");
+  const [codeError, setCodeError] = useState(false);
 
   const amountNum = Math.floor(Number(amount));
   const amountValid = Number.isFinite(amountNum) && amountNum > 0;
@@ -44,13 +49,26 @@ export function EscrowDemo() {
   const create = () => {
     if (!amountValid) return;
     const o = { name: customer.trim() || "your customer", amount: amountNum };
+    const newCode = String(Math.floor(1000 + Math.random() * 9000));
     setOrder(o);
+    setCode(newCode);
+    setCodeInput("");
+    setCodeError(false);
     setState("held");
-    push("Order created", `${o.name} paid ${peso(o.amount)} up front — it's now held safely.`);
+    push(
+      "Order created",
+      `${o.name} paid ${peso(o.amount)} up front — it's now held safely. Their delivery code is ${newCode}.`,
+    );
   };
-  const deliver = () => {
+  // Release the money only if the rider entered the customer's delivery code.
+  const tryDeliver = () => {
+    if (state !== "held") return;
+    if (codeInput.trim() !== code) {
+      setCodeError(true);
+      return;
+    }
     setState("paid");
-    push("Delivered", `Parcel delivered — ${money} was released to you.`);
+    push("Delivered", `${name} gave the rider the right code — delivery confirmed, ${money} released to you.`);
   };
   const refund = () => {
     setState("refunded");
@@ -62,6 +80,9 @@ export function EscrowDemo() {
   const reset = () => {
     setState("idle");
     setOrder(null);
+    setCode("");
+    setCodeInput("");
+    setCodeError(false);
     setLog([]);
   };
 
@@ -82,8 +103,9 @@ export function EscrowDemo() {
       </div>
 
       <p className="demo-intro">
-        Try it: enter a customer and amount, then create the order. Watch how the money stays locked
-        and safe until the parcel is delivered — or comes back to your customer if it's returned.
+        Try it: enter a customer and amount, then create the order. The money stays locked and safe —
+        it's only released when your customer enters their delivery code at the door, and it comes
+        back to them automatically if there's a problem.
       </p>
 
       {/* Order details — editable only before the order is created */}
@@ -184,6 +206,36 @@ export function EscrowDemo() {
         )}
       </div>
 
+      {/* Handover step — release is tied to the customer's delivery code */}
+      {state === "held" && (
+        <div className="handover">
+          <div className="handover-code">
+            <span className="handover-label">{name}'s delivery code</span>
+            <span className="code-chip">{code}</span>
+          </div>
+          <p className="handover-hint">
+            Your customer shows this code to the rider at the door. Entering it confirms they really
+            got the parcel — and it works even with no internet.
+          </p>
+          <label>
+            Rider enters the code
+            <input
+              value={codeInput}
+              onChange={(e) => {
+                setCodeInput(e.target.value.replace(/[^\d]/g, ""));
+                setCodeError(false);
+              }}
+              placeholder="4-digit code"
+              inputMode="numeric"
+              maxLength={4}
+            />
+          </label>
+          {codeError && (
+            <p className="error">That code doesn't match — the money stays safely held.</p>
+          )}
+        </div>
+      )}
+
       {/* Controls */}
       <div className="demo-controls">
         <button
@@ -196,11 +248,11 @@ export function EscrowDemo() {
         </button>
         <button
           className="btn success"
-          onClick={deliver}
+          onClick={tryDeliver}
           disabled={state !== "held"}
-          title={state !== "held" ? "Create an order first" : undefined}
+          title={state !== "held" ? "Create an order first" : "Confirm with the customer's delivery code"}
         >
-          <IconCheck size={18} /> Mark as delivered
+          <IconCheck size={18} /> Confirm delivery
         </button>
         <button
           className="btn warnbtn"

@@ -111,14 +111,44 @@ money go *back* to the customer, not just forward to the seller. Concretely:
 - Plain-language log + result line explaining: *"the money was locked the whole time, so the refund is
   automatic and safe."*
 
-Everything else in this doc (ramp, OTP, courier integration, arbiter, reputation) is **strategy for
-the pitch and roadmap — not built now.**
+**Also added to the demo:** a simulated **OTP-at-handover** step (see Roadmap). The buyer gets a
+delivery code; the rider must enter it to release the money — making the "who confirms delivery?"
+answer visible on screen. Still simulated.
+
+Everything else in this doc (ramp, courier integration, arbiter, reputation) is **strategy for the
+pitch and roadmap — not built now.**
+
+## Roadmap & pitch talking points
+
+Two ideas are part of the plan and worth saying out loud when judges probe. Keep these crisp.
+
+### OTP-at-handover (now shown in the demo)
+
+- **What it is:** the buyer gets a one-time delivery code; they give it to the rider at the door, and
+  entering it is what releases the escrow. Proof the parcel actually reached the buyer.
+- **What it solves:** problem #3 ("who presses delivered, what stops fraud?") with a concrete,
+  believable mechanism instead of a hand-wave.
+- **Bonus:** a short code needs no connection, so it ties directly into the **Emergency / offline mode**.
+- **Talking point:** *"Money is only released when the buyer hands the rider their one-time code —
+  so the seller can't fake a delivery, and it works even with no signal."*
+
+### Deposit-mode (Phase 2 adoption path)
+
+- **What it is:** a lighter option where the buyer locks only a small refundable deposit (~shipping
+  cost) and pays the rest cash on delivery, like normal COD.
+- **What it solves:** problem #1's adoption wall for the **everyday-COD mass market** — buyers who
+  refuse to prepay the full amount. It still kills fake/rejected orders (the deposit covers the
+  seller's courier cost).
+- **Trade-off:** it protects the seller but not the buyer on the main amount, so it's the *expansion*
+  model, not the launch model.
+- **Talking point:** *"For buyers who won't prepay, we offer a small refundable deposit — they still
+  pay cash on delivery, but the seller is covered against fake and rejected orders."*
 
 ## Explicitly NOT in this pass
 
-- Real on-chain execution of the escrow from the UI (still simulated).
+- Real on-chain execution of the escrow from the UI (still simulated, including the OTP step).
 - Any ramp integration (concierge/manual for the pilot).
-- OTP-at-handover, courier API, arbiter, reputation, KYC — all future phases.
+- Real OTP generation/SMS, courier API, arbiter, reputation, KYC, and deposit-mode — all future phases.
 
 ## Open items to verify before a real launch
 
