@@ -14,6 +14,15 @@ Joy, a Facebook-page clothing seller in Manila, ships cash-on-delivery parcels t
 
 The buyer prepays the order into a Soroban escrow at checkout. The contract releases USDC to the seller the instant delivery is confirmed, and refunds the buyer if the parcel is returned — settling in ~5 seconds for sub-cent fees, with no bank or middleman holding the money.
 
+## Works on weak signal (offline options)
+
+Many Philippine sellers and buyers are in low-connectivity areas, so the app ships an **Emergency** view with two fallbacks a customer can use when data is weak or down:
+
+- **Pay at a counter (agent model).** The customer brings cash and an order code to a nearby COD Lock counter — a sari-sari store or padala agent — who locks the money in escrow for them. Mirrors how OFW remittance counters already work; needs no new tech, just people + incentives.
+- **Pay by text (SMS/USSD).** The customer dials a short code (e.g. `*123*456#`) to confirm an order from any basic phone with no data — the M-Pesa pattern. The app includes a working preview of this flow; a production version connects to a telco / SMS gateway (next-phase backend).
+
+The app itself is also a static, cache-friendly build, so the UI and the practice demo load on a single bar of signal. The one thing that always needs a moment of connectivity is broadcasting the signed transaction to the Stellar network — no blockchain can settle fully offline.
+
 ## Timeline (bootcamp-scoped)
 
 - **Day 1** — Contract: `create_order`, `confirm_delivery`, `refund_order`, `get_order`.
