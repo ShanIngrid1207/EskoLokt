@@ -117,3 +117,48 @@ export const IconSend = (p: IconProps) => (
     <path d="M22 2 15 22l-4-9-9-4z" />
   </Base>
 );
+
+export const IconGrid = (p: IconProps) => (
+  <Base {...p}>
+    <rect x="3" y="3" width="7" height="9" rx="1.5" />
+    <rect x="14" y="3" width="7" height="5" rx="1.5" />
+    <rect x="14" y="12" width="7" height="9" rx="1.5" />
+    <rect x="3" y="16" width="7" height="5" rx="1.5" />
+  </Base>
+);
+
+export const IconPlay = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none" />
+  </Base>
+);
+
+export const IconBook = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" />
+    <path d="M4 19a2 2 0 0 1 2-2h13" />
+  </Base>
+);
+
+export const IconSearch = (p: IconProps) => (
+  <Base {...p}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.2-3.2" />
+  </Base>
+);
+
+export const IconChevronDown = (p: IconProps) => (
+  <Base {...p}>
+    <path d="m6 9 6 6 6-6" />
+  </Base>
+);
+
+export const IconSort = (p: IconProps) => (
+  <Base {...p}>
+    <path d="M8 3v18" />
+    <path d="m4 7 4-4 4 4" />
+    <path d="M16 21V3" />
+    <path d="m20 17-4 4-4-4" />
+  </Base>
+);
