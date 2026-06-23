@@ -6,6 +6,7 @@ import {
   WalletNetwork,
   allowAllModules,
 } from "@creit.tech/stellar-wallets-kit";
+import { STELLAR_NETWORK_PASSPHRASE } from "./constants";
 
 const STORAGE_KEY = "eskolokt.wallet.id";
 
@@ -58,7 +59,7 @@ export async function getKitAddress(): Promise<string | null> {
 export async function signWithKit(xdr: string, address: string): Promise<string> {
   const { signedTxXdr } = await getKit().signTransaction(xdr, {
     address,
-    networkPassphrase: WalletNetwork.TESTNET,
+    networkPassphrase: STELLAR_NETWORK_PASSPHRASE,
   });
   return signedTxXdr;
 }
