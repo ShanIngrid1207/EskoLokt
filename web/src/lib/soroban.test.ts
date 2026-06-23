@@ -17,4 +17,6 @@ describe("classifyError (the 3 required error types)", () => {
     expect(classifyError(new Error("Freighter is not installed"))).toBe("no-wallet"));
   it("falls back to unknown", () =>
     expect(classifyError(new Error("some rpc 500"))).toBe("unknown"));
+  it("prefers insufficient over rejected when a message contains both", () =>
+    expect(classifyError(new Error("transaction rejected: tx_insufficient_balance"))).toBe("insufficient"));
 });

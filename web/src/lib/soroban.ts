@@ -35,8 +35,8 @@ export type WalletErrorKind = "no-wallet" | "rejected" | "insufficient" | "unkno
 export function classifyError(e: unknown): WalletErrorKind {
   const msg = (e instanceof Error ? e.message : String(e ?? "")).toLowerCase();
   if (/not installed|no wallet|none selected|not connected|no public key/.test(msg)) return "no-wallet";
-  if (/reject|declin|denied|cancel/.test(msg)) return "rejected";
   if (/insufficient|underfunded|not enough|low balance/.test(msg)) return "insufficient";
+  if (/reject|declin|denied|cancel/.test(msg)) return "rejected";
   return "unknown";
 }
 
@@ -89,7 +89,9 @@ async function invoke(
   }
 
   let got = await sorobanServer.getTransaction(sent.hash);
+  let attempts = 0;
   while (got.status === "NOT_FOUND") {
+    if (++attempts >= 40) throw new Error("Timed out waiting for the transaction to settle.");
     await delay(1500);
     got = await sorobanServer.getTransaction(sent.hash);
   }
