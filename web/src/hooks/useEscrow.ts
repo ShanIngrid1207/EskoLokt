@@ -48,8 +48,11 @@ export function useEscrow(publicKey: string | null) {
         setOrderId(id);
         setHash(h);
         setStatus("success");
-        const fresh = await getOrder(publicKey, id);
-        setOrder(fresh);
+        try {
+          setOrder(await getOrder(publicKey, id));
+        } catch {
+          /* read-back failure must not demote a confirmed success */
+        }
       } catch (e) {
         setStatus("error");
         setError(ERROR_MESSAGE[classifyError(e)]);
@@ -69,7 +72,11 @@ export function useEscrow(publicKey: string | null) {
       const { hash: h } = await confirmDelivery({ publicKey, orderId, sign });
       setHash(h);
       setStatus("success");
-      setOrder(await getOrder(publicKey, orderId));
+      try {
+        setOrder(await getOrder(publicKey, orderId));
+      } catch {
+        /* read-back failure must not demote a confirmed success */
+      }
     } catch (e) {
       setStatus("error");
       setError(ERROR_MESSAGE[classifyError(e)]);
