@@ -2,12 +2,12 @@
 // the lib/ modules; this hook just orchestrates state for the UI.
 import { useCallback, useEffect, useState } from "react";
 import {
-  isFreighterInstalled,
-  requestWalletAddress,
-  getWalletAddress,
-  getWalletNetwork,
-  signWithFreighter,
-} from "../lib/freighter";
+  openWalletPicker,
+  getKitAddress,
+  signWithKit,
+  restoreWalletId,
+  setKitWallet,
+} from "../lib/walletKit";
 import {
   fetchXlmBalance,
   buildPaymentXdr,
@@ -16,7 +16,6 @@ import {
   isValidStellarPublicKey,
   validateAmount,
 } from "../lib/stellar";
-import { STELLAR_NETWORK_PASSPHRASE } from "../lib/constants";
 
 const STORAGE_KEY = "codlock.wallet.publicKey";
 // XLM kept un-spendable to cover the base reserve (~1 XLM) plus fees.
@@ -74,26 +73,24 @@ export function useStellarWallet() {
     [publicKey],
   );
 
-  // On mount: detect Freighter and restore a previously-authorized session.
+  // On mount: the multi-wallet picker is always available. Restore a previously
+  // chosen wallet if its address is still exposed.
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const ok = await isFreighterInstalled();
-      if (cancelled) return;
-      setInstalled(ok);
-      if (!ok) return;
+      setInstalled(true);
+      const savedId = restoreWalletId();
+      if (!savedId) return;
+      setKitWallet(savedId);
 
       const stored = typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : null;
-      if (!stored) return;
-
-      // Only restore if Freighter still exposes the same address (permission persisted).
-      const current = await getWalletAddress();
+      const current = await getKitAddress();
       if (cancelled) return;
-      if (current && current === stored) {
-        setPublicKey(stored);
-        const net = await getWalletNetwork();
-        if (!cancelled) setNetwork(net?.network ?? null);
-        await refreshBalance(stored);
+      if (current && (!stored || current === stored)) {
+        setPublicKey(current);
+        setNetwork("TESTNET");
+        if (typeof window !== "undefined") window.localStorage.setItem(STORAGE_KEY, current);
+        await refreshBalance(current);
       } else if (typeof window !== "undefined") {
         window.localStorage.removeItem(STORAGE_KEY);
       }
@@ -107,25 +104,15 @@ export function useStellarWallet() {
     setConnectError(null);
     setIsConnecting(true);
     try {
-      const ok = await isFreighterInstalled();
-      setInstalled(ok);
-      if (!ok) throw new Error("Freighter wallet is not installed.");
-
-      const address = await requestWalletAddress(); // prompts the user
-
-      const net = await getWalletNetwork();
-      setNetwork(net?.network ?? null);
-      if (net?.passphrase && net.passphrase !== STELLAR_NETWORK_PASSPHRASE) {
-        // Warn but still connect — the user can switch Freighter to Testnet.
-        setConnectError("Freighter is not on Testnet. Switch the network to Testnet in Freighter.");
-      }
-
+      const address = await openWalletPicker(); // opens the multi-wallet modal
+      setInstalled(true);
+      setNetwork("TESTNET");
       setPublicKey(address);
       if (typeof window !== "undefined") window.localStorage.setItem(STORAGE_KEY, address);
       await refreshBalance(address);
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Failed to connect to Freighter.";
-      setConnectError(isRejection(msg) ? "Connection request was rejected in Freighter." : msg);
+      const msg = e instanceof Error ? e.message : "Failed to connect a wallet.";
+      setConnectError(isRejection(msg) ? "Connection request was rejected in your wallet." : msg);
     } finally {
       setIsConnecting(false);
     }
@@ -163,7 +150,7 @@ export function useStellarWallet() {
       setTxStatus("pending");
       try {
         const xdr = await buildPaymentXdr({ source: publicKey, destination: dest, amount, memo });
-        const signed = await signWithFreighter(xdr, publicKey);
+        const signed = await signWithKit(xdr, publicKey);
         const hash = await submitSignedXdr(signed);
         setTxHash(hash);
         setTxStatus("success");
@@ -171,7 +158,7 @@ export function useStellarWallet() {
       } catch (e: unknown) {
         const raw = e instanceof Error ? e.message : "";
         setTxStatus("error");
-        setTxError(isRejection(raw) ? "Signing was rejected in Freighter." : explainSubmitError(e));
+        setTxError(isRejection(raw) ? "Signing was rejected in your wallet." : explainSubmitError(e));
       } finally {
         setIsSending(false);
       }
