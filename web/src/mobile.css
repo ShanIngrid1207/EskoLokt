@@ -1,0 +1,59 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   mobile.css — Tailwind entry for the EskoLokt mobile screen layer.
+   Imports Tailwind, then maps HSL-ready CSS variables so Tailwind's
+   color utilities (bg-primary, border-border/60, etc.) work correctly.
+
+   Color discipline (from yohan-1-ui.md):
+     • Grays  → layout surfaces
+     • Green  → primary CTA only  (--primary)
+     • Status colors → status badges only
+   ───────────────────────────────────────────────────────────────────────────── */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Design token HSL variables ──────────────────────────────────────────── */
+:root {
+  /* Tailwind-compatible HSL channels (no hsl() wrapper — Tailwind adds it) */
+  --tw-bg:         220 20% 97%;      /* #f6f7fa — page background */
+  --tw-fg:         220 30% 10%;      /* #121826 — foreground text */
+  --tw-border:     220 20% 90%;      /* #e8ebf1 — hairline borders */
+  --tw-input:      220 20% 90%;      /* same as border */
+  --tw-ring:       220 100% 60%;     /* focus ring */
+  --tw-muted-fg:   220 15% 42%;      /* #586478 — secondary text */
+
+  /* Brand green (--primary) — only on the primary button */
+  --tw-primary:    221 100% 59%;     /* #2f6bff — matches existing --primary */
+  --tw-primary-fg: 0 0% 100%;        /* white text on primary */
+
+  /* Status palette */
+  --color-amber:   38 92% 50%;
+  --color-sky:     200 98% 54%;
+  --color-emerald: 160 84% 39%;
+  --color-rose:    345 83% 47%;
+}
+
+/* ─── Mobile shell reset ───────────────────────────────────────────────────── */
+.mobile-shell {
+  /* Constrain to a phone-width column, centered */
+  min-height: 100dvh;
+  background-color: hsl(var(--tw-bg));
+  color: hsl(var(--tw-fg));
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Tailwind layer additions ─────────────────────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  /* font-heading utility referenced in ScreenHeader */
+  .font-heading {
+    font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+}
