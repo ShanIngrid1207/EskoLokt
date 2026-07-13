@@ -13,8 +13,17 @@ export const STELLAR_EXPLORER_TX = (hash: string) =>
 // Soroban (smart-contract) RPC endpoint for Testnet.
 export const SOROBAN_RPC_URL = "https://soroban-testnet.stellar.org";
 
-// The deployed CodLock escrow contract (Testnet). Do not redeploy.
-export const CONTRACT_ID = "CBHTZBTBBLKR56GO2EICGJTMJE6FUFIXTBMSG4GIMB3NVVXZUBDUPGEN";
+// The deployed EskoLokt escrow contract (Testnet). Overridable via env so the
+// redeployed deposit-model contract can be pointed at with no code change; the
+// fallback is the current (pre-upgrade) contract id.
+export const CONTRACT_ID =
+  (import.meta.env.VITE_CONTRACT_ID as string) ||
+  "CBHTZBTBBLKR56GO2EICGJTMJE6FUFIXTBMSG4GIMB3NVVXZUBDUPGEN";
+
+// Test USDC used for the refundable deposit. The issuer is filled in after the
+// one-time asset setup (env); the token's SAC address is derived at runtime.
+export const USDC_CODE = "USDC";
+export const USDC_ISSUER = (import.meta.env.VITE_USDC_ISSUER as string) || "";
 
 // Build a Testnet explorer link for a contract id.
 export const STELLAR_EXPLORER_CONTRACT = (id: string) =>
