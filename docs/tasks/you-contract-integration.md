@@ -9,6 +9,15 @@ deploy to Vercel.** The contract TDD tasks live in the master plan
 
 ## Phase 0 — Scaffold (do FIRST; unblocks both mates)
 
+> **IMPLEMENTED 2026-07-13 (with two improvements over the draft below):**
+> (1) tokens live in a **new `web/src/tailwind.css`** under **`--el-*`** names (not prepended
+> into `styles.css`) so they don't collide with the old demo's hex `--primary`/`--border`;
+> (2) Tailwind colors use `hsl(var(--el-x) / <alpha-value>)` so `/opacity` classes work.
+> Files created: `tailwind.config.js`, `postcss.config.js`, `src/tailwind.css`, `src/lib/types.ts`,
+> `src/lib/crypto.ts`, `.env.example`, `src/stubData.ts`, `src/DevHarness.tsx`; `src/main.tsx`
+> imports `tailwind.css` and renders `DevHarness` at `?dev=1`. Only remaining manual step:
+> `npm install -D tailwindcss postcss autoprefixer` in `web/`.
+
 ### P0.1 Tailwind + light-mode tokens
 - [ ] In `web/`: `npm install -D tailwindcss postcss autoprefixer && npx tailwindcss init -p`
 - [ ] `web/tailwind.config.js`:
