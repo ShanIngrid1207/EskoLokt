@@ -6,6 +6,11 @@ name: Deploy contract (testnet)
 # to the run summary. No local tools or stored secrets required.
 on:
   workflow_dispatch:
+  # Also deploy when the marker file is touched (lets us trigger from a feature
+  # branch, where workflow_dispatch isn't available until the file is on main).
+  push:
+    paths:
+      - ".github/deploy-trigger"
 
 permissions:
   contents: read
