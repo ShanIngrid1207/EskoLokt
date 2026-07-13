@@ -16,7 +16,8 @@ deploy to Vercel.** The contract TDD tasks live in the master plan
 > Files created: `tailwind.config.js`, `postcss.config.js`, `src/tailwind.css`, `src/lib/types.ts`,
 > `src/lib/crypto.ts`, `.env.example`, `src/stubData.ts`, `src/DevHarness.tsx`; `src/main.tsx`
 > imports `tailwind.css` and renders `DevHarness` at `?dev=1`. Only remaining manual step:
-> `npm install -D tailwindcss postcss autoprefixer` in `web/`.
+> `npm install -D tailwindcss@^3.4.17 postcss autoprefixer` in `web/` (pin **v3** —
+the config is v3-style; Tailwind v4 uses a different setup and would break it).
 
 ### P0.1 Tailwind + light-mode tokens
 - [ ] In `web/`: `npm install -D tailwindcss postcss autoprefixer && npx tailwindcss init -p`
