@@ -60,7 +60,7 @@ jobs:
 
       - name: Deploy to testnet
         run: |
-          WASM=$(find target/wasm32-unknown-unknown/release -maxdepth 1 -name '*.wasm' | head -n1)
+          WASM=$(ls target/*/release/*.wasm 2>/dev/null | head -n1)
           echo "WASM artifact: $WASM"
           stellar contract deploy --wasm "$WASM" --source deployer --network testnet \
             > deploy.out 2> deploy.err || { echo "DEPLOY FAILED"; cat deploy.err; exit 1; }
