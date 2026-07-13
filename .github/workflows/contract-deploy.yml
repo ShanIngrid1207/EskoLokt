@@ -36,13 +36,14 @@ jobs:
             target
           key: deploy-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
 
-      - name: Install Stellar CLI
+      - name: Install Stellar CLI (prebuilt binary)
         run: |
           if ! command -v stellar >/dev/null; then
-            # stellar-cli pulls in libdbus-sys, which needs the dbus dev headers.
-            sudo apt-get update
-            sudo apt-get install -y libdbus-1-dev pkg-config
-            cargo install --locked stellar-cli
+            # Use the prebuilt binary via cargo-binstall — avoids compiling the CLI
+            # from source and its native deps (libdbus, libudev, …).
+            curl -L --proto '=https' --tlsv1.2 -sSf \
+              https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+            cargo binstall -y stellar-cli
           fi
           stellar --version
 
