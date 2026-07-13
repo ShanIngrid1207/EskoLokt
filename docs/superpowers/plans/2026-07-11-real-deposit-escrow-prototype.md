@@ -40,8 +40,8 @@ web/src/ui/*                        CREATE  shadcn-style primitives (Mate 1, Pha
 web/src/stubData.ts                 CREATE  fake callbacks so Mate 1 builds standalone (Phase 0)
 web/tailwind.config.js, index.css   CREATE/MODIFY  Tailwind + tokens (Owner, Phase 0)
 supabase/schema.sql                 CREATE  orders table + RLS + realtime (Mate 2)
-docs/tasks/mate-1-ui.md             brief for Mate 1
-docs/tasks/mate-2-supabase.md       brief for Mate 2
+docs/tasks/yohan-1-ui.md            brief for Yohan (UI)
+docs/tasks/myr-2-supabase.md        brief for Myr (Supabase)
 docs/tasks/you-contract-integration.md  brief for Owner
 ```
 
@@ -136,7 +136,7 @@ Phase 0 (Owner, FIRST — unblocks everyone):
    Owner track          Mate 1 (UI)           Mate 2 (Supabase)
    contract upgrade     screens vs stubs      schema + orders.ts
    + redeploy           (docs/tasks/          (docs/tasks/
-   USDC setup            mate-1-ui.md)         mate-2-supabase.md)
+   USDC setup            yohan-1-ui.md)        myr-2-supabase.md)
    wallet.ts + soroban.ts
         │                    │                     │
         └────────────────────┴─────────────────────┘
@@ -145,8 +145,8 @@ Phase 0 (Owner, FIRST — unblocks everyone):
 ```
 
 The three briefs are self-contained:
-- **Mate 1:** [`../../tasks/mate-1-ui.md`](../../tasks/mate-1-ui.md)
-- **Mate 2:** [`../../tasks/mate-2-supabase.md`](../../tasks/mate-2-supabase.md)
+- **Yohan (UI):** [`../../tasks/yohan-1-ui.md`](../../tasks/yohan-1-ui.md)
+- **Myr (Supabase):** [`../../tasks/myr-2-supabase.md`](../../tasks/myr-2-supabase.md)
 - **Owner:** [`../../tasks/you-contract-integration.md`](../../tasks/you-contract-integration.md)
 
 The Owner brief contains the full Phase-0 scaffold, the contract tasks (below, in TDD), USDC setup, wallet/soroban code, integration, and deploy. The contract tasks are reproduced here as the plan's canonical record.
