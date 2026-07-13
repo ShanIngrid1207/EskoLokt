@@ -38,7 +38,12 @@ jobs:
 
       - name: Install Stellar CLI
         run: |
-          command -v stellar >/dev/null || cargo install --locked stellar-cli
+          if ! command -v stellar >/dev/null; then
+            # stellar-cli pulls in libdbus-sys, which needs the dbus dev headers.
+            sudo apt-get update
+            sudo apt-get install -y libdbus-1-dev pkg-config
+            cargo install --locked stellar-cli
+          fi
           stellar --version
 
       - name: Build contract
