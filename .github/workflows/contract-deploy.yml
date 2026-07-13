@@ -24,7 +24,9 @@ jobs:
       - name: Rust + wasm target
         run: |
           rustup default stable
-          rustup target add wasm32-unknown-unknown
+          # Current stellar-cli builds contracts for wasm32v1-none; keep the older
+          # target too for compatibility.
+          rustup target add wasm32v1-none wasm32-unknown-unknown
 
       - name: Cache cargo + stellar CLI
         uses: actions/cache@v4

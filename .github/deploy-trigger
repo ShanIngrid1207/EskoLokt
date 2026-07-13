@@ -1,2 +1,2 @@
 Touch this file (change the number) and push to trigger a testnet contract deploy.
-deploy: 3
+deploy: 4
