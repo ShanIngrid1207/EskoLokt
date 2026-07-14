@@ -3,6 +3,7 @@ import { ORDERS, STATUS_META, summarize, VOLUME_BUCKETS } from "../data/orders";
 import type { Order, OrderStatus } from "../data/orders";
 import { MiniBarChart } from "./MiniBarChart";
 import { IconSearch, IconChevronDown, IconExternal } from "./icons";
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 const CONTRACT_URL =
   "https://stellar.expert/explorer/testnet/contract/CBHTZBTBBLKR56GO2EICGJTMJE6FUFIXTBMSG4GIMB3NVVXZUBDUPGEN";
@@ -15,6 +16,40 @@ const TABS: StatusTab[] = ["All", "Held", "Paid", "Refunded"];
 
 const peso = (n: number) => `₱${n.toLocaleString("en-US")}`;
 const fmtSettle = (ms: number) => (ms === 0 ? "—" : `${(ms / 1000).toFixed(2)}s`);
+function getDeltaIcon(tone: "up" | "down" | "neutral") {
+  if (tone === "up") return TrendingUp;
+  if (tone === "down") return TrendingDown;
+  return Minus;
+}
+
+// Derive KPI stats from the full ORDERS array (all-time view for the header cards).
+const ALL_SUMMARY = summarize(ORDERS);
+const KPI_CARDS = [
+  {
+    label: "Total orders",
+    value: String(ALL_SUMMARY.total),
+    delta: "+3.1% vs last week",
+    tone: "up" as const,
+  },
+  {
+    label: "Volume",
+    value: peso(ALL_SUMMARY.volume),
+    delta: "+12.4% vs last week",
+    tone: "up" as const,
+  },
+  {
+    label: "Held (escrow active)",
+    value: String(ALL_SUMMARY.rows.find((r) => r.status === "Held")?.count ?? 0),
+    delta: "awaiting delivery",
+    tone: "neutral" as const,
+  },
+  {
+    label: "Paid out",
+    value: String(ALL_SUMMARY.rows.find((r) => r.status === "Paid")?.count ?? 0),
+    delta: "+8.7% vs last week",
+    tone: "up" as const,
+  },
+];
 
 export function OrdersDashboard() {
   const [tab, setTab] = useState<StatusTab>("All");
@@ -45,7 +80,23 @@ export function OrdersDashboard() {
 
   return (
     <div className="orders">
-      {/* Status tab strip */}
+      {/* ── KPI stat cards (Efferd-style) ──────────────────────────────── */}
+      <div className="kpi-grid">
+        {KPI_CARDS.map((kpi) => {
+          const DeltaIcon = getDeltaIcon(kpi.tone);
+          return (
+            <div className="kpi-card" key={kpi.label}>
+              <p className="kpi-label">{kpi.label}</p>
+              <p className="kpi-value">{kpi.value}</p>
+              <span className={`kpi-delta ${kpi.tone}`}>
+                <DeltaIcon size={12} />
+                {kpi.delta}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
       <div className="tabstrip" role="tablist">
         {TABS.map((t) => {
           const count = t === "All" ? ORDERS.length : ORDERS.filter((o) => o.status === t).length;

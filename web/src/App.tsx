@@ -9,15 +9,16 @@ import {
   ShieldCheck,
   Zap,
   BookOpen,
+  HelpingHand,
 } from "lucide-react";
 
 type View = "orders" | "guide" | "proof" | "live";
 
-const NAV: { id: View; label: string; Icon: React.ElementType }[] = [
-  { id: "orders",  label: "Orders",       Icon: LayoutGrid  },
-  { id: "guide",   label: "How it works", Icon: HelpCircle  },
-  { id: "proof",   label: "Proof",        Icon: ShieldCheck },
-  { id: "live",    label: "Live",         Icon: Zap         },
+const MAIN_NAV: { id: View; label: string; Icon: React.ElementType }[] = [
+  { id: "orders", label: "Orders",       Icon: LayoutGrid  },
+  { id: "guide",  label: "How it works", Icon: HelpCircle  },
+  { id: "proof",  label: "Proof",        Icon: ShieldCheck },
+  { id: "live",   label: "Live",         Icon: Zap         },
 ];
 
 const TITLES: Record<View, { title: string; sub: string }> = {
@@ -48,40 +49,59 @@ export default function App() {
 
   return (
     <div className="shell">
-      {/* Dark rail */}
+      {/* ── Sidebar (Efferd-style: wide, icon+text inline, section labels) ── */}
       <nav className="rail" aria-label="Primary">
-        <div className="rail-logo" title="Esko Lokt">
-          <ShieldCheck size={20} />
+
+        {/* Logo + brand row */}
+        <div className="rail-brand-row">
+          <div className="rail-logo" title="Esko Lokt">
+            <ShieldCheck size={18} />
+          </div>
+          <span className="rail-brand">Esko Lokt</span>
         </div>
-        <span className="rail-brand">ESKO LOKT</span>
+
+        {/* Product section */}
+        <span className="rail-section">Product</span>
         <div className="rail-items">
-          {NAV.map(({ id, label, Icon }) => (
+          {MAIN_NAV.map(({ id, label, Icon }) => (
             <button
               key={id}
               className={`rail-item ${view === id ? "active" : ""}`}
               onClick={() => setView(id)}
               aria-current={view === id ? "page" : undefined}
             >
-              <Icon size={18} />
+              <Icon size={16} />
               <span>{label}</span>
             </button>
           ))}
         </div>
-        <a
-          className="rail-item docs"
-          href={REPO_URL}
-          target="_blank"
-          rel="noreferrer"
-          title="View source on GitHub"
-        >
-          <BookOpen size={18} />
-          <span>Docs</span>
-        </a>
+
+        {/* Bottom: docs & help */}
+        <div className="rail-bottom">
+          <span className="rail-section">Resources</span>
+          <a
+            className="rail-item"
+            href={REPO_URL}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <BookOpen size={16} />
+            <span>Documentation</span>
+          </a>
+          <a
+            className="rail-item"
+            href={`${REPO_URL}/issues`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <HelpingHand size={16} />
+            <span>Help Center</span>
+          </a>
+        </div>
       </nav>
 
-      {/* Content column */}
+      {/* ── Content column ── */}
       <div className="content">
-        {/* Top bar */}
         <header className="topbar">
           <div className="crumbs">
             <span className="crumb org">ShanIngrid1207</span>
