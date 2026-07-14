@@ -11,4 +11,9 @@ export default defineConfig({
     ? "/EskoLokt/"
     : "/",
   plugins: [react()],
+  // StellarWalletsKit's randombytes dep references Node's `global`; map it to
+  // the browser's `globalThis` so the bundle doesn't crash on load.
+  define: {
+    global: "globalThis",
+  },
 });

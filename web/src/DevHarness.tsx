@@ -28,6 +28,7 @@ import {
 import { FRIENDBOT_URL, USDC_CODE, USDC_ISSUER } from "./lib/constants";
 import { stub, sampleOrder } from "./stubData";
 import type { OrderView, OrderStatus } from "./lib/types";
+import { Package, CreditCard, WifiOff, ChevronLeft } from "lucide-react";
 
 import { HomeScreen } from "./screens/HomeScreen";
 import { SellerCreateScreen } from "./screens/SellerCreateScreen";
@@ -46,10 +47,10 @@ type Screen =
   | { id: "emergency" };
 
 type Tab = "home" | "connect" | "emergency";
-const TABS: { id: Tab; label: string; emoji: string }[] = [
-  { id: "home", label: "Orders", emoji: "📦" },
-  { id: "connect", label: "Wallet", emoji: "💳" },
-  { id: "emergency", label: "Offline", emoji: "📵" },
+const TABS: { id: Tab; label: string; Icon: React.ElementType }[] = [
+  { id: "home",      label: "Orders",  Icon: Package    },
+  { id: "connect",   label: "Wallet",  Icon: CreditCard },
+  { id: "emergency", label: "Offline", Icon: WifiOff    },
 ];
 
 export default function DevHarness() {
@@ -240,13 +241,13 @@ export default function DevHarness() {
       {isSubScreen && (
         <div className="sticky top-0 z-40 flex items-center gap-2 border-b border-border/60 bg-background/90 px-4 py-3 backdrop-blur">
           <button
-            id="mobile-back-btn"
-            onClick={goHome}
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-border/60 text-muted-foreground transition-colors hover:border-border hover:text-foreground"
-            aria-label="Go back"
-          >
-            ‹
-          </button>
+          id="mobile-back-btn"
+          onClick={goHome}
+          className="flex h-8 w-8 items-center justify-center rounded-full border border-border/60 text-muted-foreground transition-colors hover:border-border hover:text-foreground"
+          aria-label="Go back"
+        >
+          <ChevronLeft size={16} />
+        </button>
           <span className="text-sm font-medium">
             {screen.id === "sell"
               ? "Create order"
@@ -264,22 +265,22 @@ export default function DevHarness() {
       {!isSubScreen && (
         <nav className="sticky bottom-0 z-40 border-t border-border/60 bg-background/90 backdrop-blur">
           <div className="mx-auto flex max-w-md justify-around px-4 py-2">
-            {TABS.map((t) => (
+            {TABS.map(({ id, label, Icon }) => (
               <button
-                key={t.id}
-                id={`tab-${t.id}`}
+                key={id}
+                id={`tab-${id}`}
                 onClick={() => {
-                  setTab(t.id);
+                  setTab(id);
                   setScreen({ id: "home" });
                 }}
                 className={`flex flex-col items-center gap-0.5 px-4 py-1.5 transition-colors ${
-                  tab === t.id
+                  tab === id
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <span className="text-lg" aria-hidden="true">{t.emoji}</span>
-                <span className="text-[10px] font-medium tracking-wide">{t.label}</span>
+                <Icon size={20} aria-hidden="true" />
+                <span className="text-[10px] font-medium tracking-wide">{label}</span>
               </button>
             ))}
           </div>

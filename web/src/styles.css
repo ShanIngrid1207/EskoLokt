@@ -84,7 +84,7 @@ h1 {
 .shell {
   display: grid;
   grid-template-columns: 92px 1fr;
-  height: 100%;
+  min-height: 100vh;
 }
 
 /* Rail */
@@ -95,6 +95,11 @@ h1 {
   align-items: center;
   padding: 16px 8px;
   gap: 10px;
+  /* Fix 1: rail stays full-height and never scrolls — Docs always visible */
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
 }
 .rail-logo {
   display: grid;
@@ -1674,3 +1679,158 @@ input:focus {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* ---------- Live Escrow Panel layout ---------- */
+.live-layout {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 18px;
+  align-items: start;
+  max-width: 940px;
+}
+.live-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.live-panel-body {
+  padding: 16px 18px;
+}
+.live-helper-text {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.live-field-hint {
+  color: var(--dim);
+  font-weight: 400;
+}
+.live-input {
+  display: block;
+  width: 100%;
+  height: 38px;
+  padding: 0 11px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.live-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+.live-input:disabled {
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+.live-section-label {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.live-connected-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--success-press);
+}
+.live-error-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--danger);
+}
+
+/* Step buttons */
+.live-steps-body {
+  padding: 8px 0;
+}
+.live-step-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: background 0.13s ease;
+}
+.live-step-btn:hover:not(.disabled) {
+  background: var(--surface-2);
+}
+.live-step-btn.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.live-step-num {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  color: var(--primary-press);
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.live-step-body {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+}
+.live-step-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0 18px;
+}
+@keyframes live-spin {
+  to { transform: rotate(360deg); }
+}
+.live-spin {
+  animation: live-spin 0.9s linear infinite;
+}
+
+@media (max-width: 780px) {
+  .live-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Dark mode ---------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1117;
+    --surface: #171b26;
+    --surface-2: #1d2130;
+    --border: #252a3a;
+    --border-strong: #2e3448;
+    --text: #eef0f6;
+    --muted: #8892a8;
+    --dim: #6b7489;
+    --primary-soft: #1a2440;
+    --success-soft: #0d2b20;
+    --warn-soft: #2a1f0d;
+    --danger-soft: #2a1217;
+  }
+}
+

@@ -3,15 +3,21 @@ import { OrdersDashboard } from "./components/OrdersDashboard";
 import { GuideView } from "./components/GuideView";
 import { ProofView } from "./components/ProofView";
 import { LiveEscrowPanel } from "./components/LiveEscrowPanel";
-import { IconGrid, IconInfo, IconShield, IconBook } from "./components/icons";
+import {
+  LayoutGrid,
+  HelpCircle,
+  ShieldCheck,
+  Zap,
+  BookOpen,
+} from "lucide-react";
 
 type View = "orders" | "guide" | "proof" | "live";
 
-const NAV: { id: View; label: string; icon: typeof IconGrid }[] = [
-  { id: "orders", label: "Orders", icon: IconGrid },
-  { id: "guide", label: "How it works", icon: IconInfo },
-  { id: "proof", label: "Proof", icon: IconShield },
-  { id: "live", label: "Live", icon: IconShield },
+const NAV: { id: View; label: string; Icon: React.ElementType }[] = [
+  { id: "orders",  label: "Orders",       Icon: LayoutGrid  },
+  { id: "guide",   label: "How it works", Icon: HelpCircle  },
+  { id: "proof",   label: "Proof",        Icon: ShieldCheck },
+  { id: "live",    label: "Live",         Icon: Zap         },
 ];
 
 const TITLES: Record<View, { title: string; sub: string }> = {
@@ -45,27 +51,30 @@ export default function App() {
       {/* Dark rail */}
       <nav className="rail" aria-label="Primary">
         <div className="rail-logo" title="Esko Lokt">
-          <IconShield size={22} />
+          <ShieldCheck size={20} />
         </div>
-        <span className="rail-brand">Esko Lokt</span>
+        <span className="rail-brand">ESKO LOKT</span>
         <div className="rail-items">
-          {NAV.map((item) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.id}
-                className={`rail-item ${view === item.id ? "active" : ""}`}
-                onClick={() => setView(item.id)}
-                aria-current={view === item.id ? "page" : undefined}
-              >
-                <Icon size={20} />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
+          {NAV.map(({ id, label, Icon }) => (
+            <button
+              key={id}
+              className={`rail-item ${view === id ? "active" : ""}`}
+              onClick={() => setView(id)}
+              aria-current={view === id ? "page" : undefined}
+            >
+              <Icon size={18} />
+              <span>{label}</span>
+            </button>
+          ))}
         </div>
-        <a className="rail-item docs" href={REPO_URL} target="_blank" rel="noreferrer">
-          <IconBook size={20} />
+        <a
+          className="rail-item docs"
+          href={REPO_URL}
+          target="_blank"
+          rel="noreferrer"
+          title="View source on GitHub"
+        >
+          <BookOpen size={18} />
           <span>Docs</span>
         </a>
       </nav>
@@ -97,9 +106,9 @@ export default function App() {
             </div>
 
             {view === "orders" && <OrdersDashboard />}
-            {view === "guide" && <GuideView />}
-            {view === "proof" && <ProofView />}
-            {view === "live" && <LiveEscrowPanel />}
+            {view === "guide"  && <GuideView />}
+            {view === "proof"  && <ProofView />}
+            {view === "live"   && <LiveEscrowPanel />}
           </div>
         </main>
       </div>
