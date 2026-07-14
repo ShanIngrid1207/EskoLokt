@@ -1,32 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import App from "./App";
+import DevHarness from "./DevHarness";
+import "./tailwind.css";
+import "./styles.css";
 
-// ─── Conditional entry: ?mobile=1 → mobile screen layer ──────────────────────
-const isMobile =
-  typeof window !== "undefined" &&
-  new URLSearchParams(window.location.search).has("mobile");
+// Open with ?dev=1 to see the new mobile screen sandbox instead of the old demo.
+const isDev = new URLSearchParams(window.location.search).has("dev");
 
-async function boot() {
-  if (isMobile) {
-    // Load Tailwind-powered mobile CSS only for the mobile harness
-    await import("./mobile.css");
-    const { default: MobileApp } = await import("./MobileApp");
-    ReactDOM.createRoot(document.getElementById("root")!).render(
-      <React.StrictMode>
-        <MobileApp />
-      </React.StrictMode>,
-    );
-  } else {
-    // Existing desktop dashboard
-    await import("./styles.css");
-    const { default: App } = await import("./App");
-    ReactDOM.createRoot(document.getElementById("root")!).render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>,
-    );
-  }
-}
-
-boot();
-
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    {isDev ? <DevHarness /> : <App />}
+  </React.StrictMode>,
+);

@@ -8,9 +8,11 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   },
   "dependencies": {
+    "@creit.tech/stellar-wallets-kit": "^1.9.5",
     "@stellar/freighter-api": "^4.0.0",
     "@stellar/stellar-sdk": "^13.0.0",
     "qrcode": "^1.5.4",
@@ -26,6 +28,7 @@
     "postcss": "^8.5.18",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.6.3",
-    "vite": "^6.0.7"
+    "vite": "^6.0.7",
+    "vitest": "^2.1.9"
   }
 }

@@ -4,32 +4,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        // These reference the HSL channel variables defined in mobile.css.
-        // The color-mix / opacity modifiers (e.g. bg-border/60) work because
-        // Tailwind v3 generates opacity utilities via CSS custom properties.
-        background:         "hsl(var(--tw-bg))",
-        foreground:         "hsl(var(--tw-fg))",
-        border:             "hsl(var(--tw-border))",
-        input:              "hsl(var(--tw-input))",
-        ring:               "hsl(var(--tw-ring))",
-        "muted-foreground": "hsl(var(--tw-muted-fg))",
-        "primary-foreground": "hsl(var(--tw-primary-fg))",
-        primary: {
-          DEFAULT: "hsl(var(--tw-primary))",
-          foreground: "hsl(var(--tw-primary-fg))",
-        },
+        // EskoLokt tokens live under --el-* so they never collide with the
+        // existing hex custom properties in styles.css (old demo keeps working).
+        background: "hsl(var(--el-background) / <alpha-value>)",
+        foreground: "hsl(var(--el-foreground) / <alpha-value>)",
+        "muted-foreground": "hsl(var(--el-muted-foreground) / <alpha-value>)",
+        border: "hsl(var(--el-border) / <alpha-value>)",
+        input: "hsl(var(--el-input) / <alpha-value>)",
+        ring: "hsl(var(--el-ring) / <alpha-value>)",
+        card: "hsl(var(--el-card) / <alpha-value>)",
+        primary: "hsl(var(--el-primary) / <alpha-value>)",
+        "primary-foreground": "hsl(var(--el-primary-foreground) / <alpha-value>)",
       },
       fontFamily: {
-        sans:    ["Geist", "ui-sans-serif", "system-ui", "sans-serif"],
-        mono:    ["Geist Mono", "ui-monospace", "SF Mono", "Menlo", "monospace"],
-        heading: ["Geist", "ui-sans-serif", "system-ui", "sans-serif"],
-      },
-      borderRadius: {
-        xl: "14px",
-        lg: "10px",
+        heading: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
+        mono: ["Geist Mono", "IBM Plex Mono", "ui-monospace", "monospace"],
       },
     },
   },
   plugins: [],
 };
-

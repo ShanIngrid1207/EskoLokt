@@ -1,0 +1,75 @@
+name: Deploy contract (testnet)
+
+# Manual, cloud-only deploy of the deposit-escrow contract to Stellar Testnet.
+# Generates a throwaway, friendbot-funded key as the deploy source (the contract
+# has no admin, so the key is irrelevant afterward) and prints the CONTRACT_ID
+# to the run summary. No local tools or stored secrets required.
+on:
+  workflow_dispatch:
+  # Also deploy when the marker file is touched (lets us trigger from a feature
+  # branch, where workflow_dispatch isn't available until the file is on main).
+  push:
+    paths:
+      - ".github/deploy-trigger"
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rust + wasm target
+        run: |
+          rustup default stable
+          # Current stellar-cli builds contracts for wasm32v1-none; keep the older
+          # target too for compatibility.
+          rustup target add wasm32v1-none wasm32-unknown-unknown
+
+      - name: Cache cargo + stellar CLI
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin
+            target
+          key: deploy-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+
+      - name: Install Stellar CLI (prebuilt binary)
+        run: |
+          if ! command -v stellar >/dev/null; then
+            # Use the prebuilt binary via cargo-binstall — avoids compiling the CLI
+            # from source and its native deps (libdbus, libudev, …).
+            curl -L --proto '=https' --tlsv1.2 -sSf \
+              https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+            cargo binstall -y stellar-cli
+          fi
+          stellar --version
+
+      - name: Build contract
+        run: stellar contract build
+
+      - name: Generate + fund deploy key
+        run: |
+          stellar keys generate deployer --network testnet || true
+          stellar keys fund deployer --network testnet || true
+          echo "Deployer: $(stellar keys address deployer)"
+
+      - name: Deploy to testnet
+        run: |
+          WASM=$(ls target/*/release/*.wasm 2>/dev/null | head -n1)
+          echo "WASM artifact: $WASM"
+          stellar contract deploy --wasm "$WASM" --source deployer --network testnet \
+            > deploy.out 2> deploy.err || { echo "DEPLOY FAILED"; cat deploy.err; exit 1; }
+          CID=$(tail -n1 deploy.out)
+          echo "Deployed contract id: $CID"
+          {
+            echo "### ✅ Deployed EskoLokt deposit contract (testnet)"
+            echo ""
+            echo "**CONTRACT_ID:** \`$CID\`"
+            echo ""
+            echo "[View on Stellar Explorer](https://stellar.expert/explorer/testnet/contract/$CID)"
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -2,14 +2,16 @@ import { useState } from "react";
 import { OrdersDashboard } from "./components/OrdersDashboard";
 import { GuideView } from "./components/GuideView";
 import { ProofView } from "./components/ProofView";
+import { LiveEscrowPanel } from "./components/LiveEscrowPanel";
 import { IconGrid, IconInfo, IconShield, IconBook } from "./components/icons";
 
-type View = "orders" | "guide" | "proof";
+type View = "orders" | "guide" | "proof" | "live";
 
 const NAV: { id: View; label: string; icon: typeof IconGrid }[] = [
   { id: "orders", label: "Orders", icon: IconGrid },
   { id: "guide", label: "How it works", icon: IconInfo },
   { id: "proof", label: "Proof", icon: IconShield },
+  { id: "live", label: "Live", icon: IconShield },
 ];
 
 const TITLES: Record<View, { title: string; sub: string }> = {
@@ -25,10 +27,14 @@ const TITLES: Record<View, { title: string; sub: string }> = {
     title: "Proof it's real",
     sub: "The live program on Stellar that settles every sale automatically. If you're curious, you can also try a real payment yourself — no real money involved.",
   },
+  live: {
+    title: "Live on Testnet",
+    sub: "Run the real escrow contract yourself with free practice XLM — lock a deposit, read it back from the chain, and release it, with a verifiable transaction each step.",
+  },
 };
 
-const REPO_URL = "https://github.com/ShanIngrid1207/CodLock";
-const SITE_URL = "https://shaningrid1207.github.io/CodLock/";
+const REPO_URL = "https://github.com/ShanIngrid1207/EskoLokt";
+const SITE_URL = "https://shaningrid1207.github.io/EskoLokt/";
 
 export default function App() {
   const [view, setView] = useState<View>("orders");
@@ -93,6 +99,7 @@ export default function App() {
             {view === "orders" && <OrdersDashboard />}
             {view === "guide" && <GuideView />}
             {view === "proof" && <ProofView />}
+            {view === "live" && <LiveEscrowPanel />}
           </div>
         </main>
       </div>

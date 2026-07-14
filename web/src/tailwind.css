@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* EskoLokt design tokens — light mode. Namespaced --el-* to avoid clashing with
+   the legacy hex custom properties still used by the old demo in styles.css.
+   Values are HSL channels (no wrapper) so Tailwind can apply /opacity modifiers. */
+:root {
+  --el-background: 0 0% 100%;
+  --el-foreground: 220 20% 12%;
+  --el-muted-foreground: 220 10% 45%;
+  --el-border: 220 13% 88%;
+  --el-input: 220 13% 85%;
+  --el-ring: 152 45% 40%;
+  --el-card: 0 0% 100%;
+  --el-primary: 152 55% 38%;          /* brand green — TODO: match exact brand hex */
+  --el-primary-foreground: 0 0% 100%;
+}

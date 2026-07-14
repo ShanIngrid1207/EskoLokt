@@ -1,0 +1,36 @@
+name: Contract tests
+
+# Verifies the Soroban deposit-escrow contract in the cloud, so no local Rust
+# toolchain is needed. Runs the unit tests (native — no wasm target required).
+on:
+  push:
+    paths:
+      - "contracts/**"
+      - "Cargo.toml"
+      - ".github/workflows/contract-tests.yml"
+  pull_request:
+    paths:
+      - "contracts/**"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ensure Rust stable
+        run: rustup default stable && rustc --version && cargo --version
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+
+      - name: Run EskoLokt contract tests
+        working-directory: contracts/CodLock
+        run: cargo test
