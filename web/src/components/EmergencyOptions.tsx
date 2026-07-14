@@ -4,7 +4,7 @@ import { IconStore, IconPhone, IconCheck, IconPin } from "./icons";
 // Two offline fallbacks for areas with weak or no signal, in plain seller
 // language. Cash is paid on delivery (true COD); these flows just confirm
 // delivery and handle the small deposit. The text flow is a faithful simulated
-// feature-phone screen (a real version needs a telco / SMS gateway backend).
+// phone screen (a real version needs a telco / SMS gateway backend).
 
 const AGENTS = [
   { name: "Aling Nena's Store", dist: "200 m", open: true },
@@ -109,7 +109,7 @@ function CounterCard() {
   );
 }
 
-/* ---------- Option 2: Pay by Text ---------- */
+/* ---------- Option 2: Pay by Text (Full-size phone mockup) ---------- */
 function TextCard() {
   // 0 = idle, 1 = dialed (menu shown), 2 = confirmed
   const [step, setStep] = useState(0);
@@ -131,50 +131,68 @@ function TextCard() {
         delivery and get their deposit back — the same way GCash or M-Pesa work on basic phones.
       </p>
 
-      {/* Simulated feature-phone screen */}
+      {/* Full-size realistic phone screen mockup */}
       <div className="phone">
         <div className="phone-screen" aria-live="polite">
-          {step === 0 && (
-            <div className="ussd">
-              <p className="ussd-line dim">Dial to confirm your order:</p>
-              <p className="ussd-code">*123*456#</p>
-            </div>
-          )}
-          {step === 1 && (
-            <div className="ussd">
-              <p className="ussd-title">Esko Lokt</p>
-              <p className="ussd-line">Order COD-7F3K · ₱500</p>
-              <p className="ussd-line">1. Confirm delivery</p>
-              <p className="ussd-line">2. Check status</p>
-              <p className="ussd-line">3. Report problem</p>
-            </div>
-          )}
-          {step === 2 && (
-            <div className="ussd">
-              <p className="ussd-ok">✓ Delivered</p>
-              <p className="ussd-line">Your ₱50 deposit was returned.</p>
-              <p className="ussd-line dim">Ref: COD-7F3K</p>
-            </div>
-          )}
-        </div>
-      </div>
+          {/* Top Notch & Status Bar */}
+          <div className="phone-top-bar">
+            <span className="phone-time">14:30</span>
+            <div className="phone-notch" />
+            <span className="phone-icons">LTE ▮▮▮</span>
+          </div>
 
-      <div className="phone-actions">
-        {step === 0 && (
-          <button className="btn primary" onClick={() => setStep(1)}>
-            Dial *123*456#
-          </button>
-        )}
-        {step === 1 && (
-          <button className="btn success" onClick={() => setStep(2)}>
-            Reply “1” to confirm
-          </button>
-        )}
-        {step === 2 && (
-          <button className="btn ghost sm" onClick={() => setStep(0)}>
-            Start over
-          </button>
-        )}
+          {/* Phone Display Content */}
+          <div className="phone-display-body">
+            {step === 0 && (
+              <div className="ussd">
+                <p className="ussd-line dim">USSD Code / Phone Dialer</p>
+                <p className="ussd-code">*123*456#</p>
+                <p className="ussd-line dim" style={{ marginTop: 12 }}>
+                  Dial shortcode to access Esko Lokt offline menu
+                </p>
+              </div>
+            )}
+            {step === 1 && (
+              <div className="ussd">
+                <p className="ussd-title">Esko Lokt USSD</p>
+                <p className="ussd-line">Order COD-7F3K · ₱500</p>
+                <div className="ussd-menu-divider" />
+                <p className="ussd-line">1. Confirm delivery</p>
+                <p className="ussd-line">2. Check order status</p>
+                <p className="ussd-line">3. Report problem</p>
+              </div>
+            )}
+            {step === 2 && (
+              <div className="ussd">
+                <p className="ussd-ok">✓ Delivery Confirmed</p>
+                <p className="ussd-line">Your ₱50 deposit has been returned to your wallet.</p>
+                <p className="ussd-line dim" style={{ marginTop: 8 }}>Ref: COD-7F3K</p>
+              </div>
+            )}
+          </div>
+
+          {/* Phone Actions inside / below display */}
+          <div className="phone-actions">
+            {step === 0 && (
+              <button className="btn primary phone-btn" onClick={() => setStep(1)}>
+                Dial *123*456#
+              </button>
+            )}
+            {step === 1 && (
+              <button className="btn success phone-btn" onClick={() => setStep(2)}>
+                Reply “1” to confirm
+              </button>
+            )}
+            {step === 2 && (
+              <button className="btn ghost sm phone-btn" onClick={() => setStep(0)}>
+                Start over
+              </button>
+            )}
+          </div>
+
+          {/* Bottom Home Indicator */}
+          <div className="phone-home-bar" />
+        </div>
       </div>
 
       <p className="opt-note">

@@ -1427,26 +1427,26 @@ input:focus {
 }
 
 /* ---------- Guide layout (overview + demo + offline side by side) ---------- */
-.guide-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 440px;
-  gap: 26px;
-  align-items: start;
-}
-.guide-main {
-  min-width: 0;
-}
-.guide-main .how {
-  max-width: none;
-}
-.guide-main .contract-view {
-  max-width: none;
-}
-.guide-side {
+.guide-view-container {
   display: flex;
   flex-direction: column;
+  gap: 28px;
+}
+.guide-top-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
   gap: 24px;
+  align-items: start;
+}
+.guide-main-col,
+.guide-side-col {
   min-width: 0;
+}
+.guide-main-col .how {
+  max-width: none;
+}
+.guide-bottom-section {
+  width: 100%;
 }
 .guide-block {
   display: flex;
@@ -1460,22 +1460,19 @@ input:focus {
   text-transform: uppercase;
   color: var(--dim);
 }
-/* the right column is narrow, so stack the two offline cards */
-.guide-side .emergency {
-  max-width: none;
+/* emergency grid inside bottom section spans 2 columns */
+.emergency-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 20px;
+  align-items: start;
 }
-.guide-side .emergency-intro {
-  display: none;
-}
-.guide-side .emergency-grid {
-  grid-template-columns: 1fr;
-}
-@media (max-width: 1080px) {
-  .guide-layout {
+@media (max-width: 1024px) {
+  .guide-top-grid {
     grid-template-columns: 1fr;
   }
-  .guide-side {
-    max-width: 620px;
+  .emergency-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1628,21 +1625,58 @@ input:focus {
   align-self: flex-start;
 }
 
-/* simulated feature phone */
+/* realistic feature / smartphone screen mockup */
 .phone {
   display: flex;
   justify-content: center;
-  padding: 4px 0;
+  padding: 8px 0;
 }
 .phone-screen {
   width: 100%;
-  max-width: 256px;
-  min-height: 152px;
+  max-width: 290px;
+  min-height: 500px;
   background: #0b0f1e;
-  border: 6px solid #19223a;
-  border-radius: 20px;
-  padding: 16px;
-  box-shadow: var(--shadow);
+  border: 10px solid #1c2336;
+  border-radius: 36px;
+  padding: 16px 18px 12px;
+  box-shadow: 0 16px 36px rgba(11, 15, 30, 0.35);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+.phone-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #7d8dae;
+  padding-bottom: 12px;
+}
+.phone-notch {
+  width: 64px;
+  height: 5px;
+  background: #20293f;
+  border-radius: 100px;
+}
+.phone-display-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 14px 0;
+}
+.phone-home-bar {
+  width: 100px;
+  height: 4px;
+  background: #20293f;
+  border-radius: 100px;
+  margin: 12px auto 0;
+}
+.phone-btn {
+  width: 100%;
+  justify-content: center;
 }
 .ussd {
   font-family: var(--mono);
