@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from "react";
 import QRCode from "qrcode";
-import { Button, Card, MicroLabel, ScreenHeader, StickyActionBar } from "../ui/primitives";
+import { Button, Card, MicroLabel, ScreenHeader } from "../ui/primitives";
 import { toast } from "../ui/toast";
 import { fmtPhp } from "../lib/money";
 
@@ -116,7 +116,7 @@ export function SellerCreateScreen({
 
   // ─── Create form ────────────────────────────────────────────────────────────
   return (
-    <div className="mx-auto max-w-md px-4 py-8 pb-28 md:max-w-2xl">
+    <div className="mx-auto max-w-md px-4 py-8 md:max-w-2xl">
       <ScreenHeader
         crumb="New order"
         title="Create an order"
@@ -182,18 +182,18 @@ export function SellerCreateScreen({
         </div>
 
         {error && <p className="text-sm text-rose-600">{error}</p>}
-      </Card>
 
-      <StickyActionBar>
-        <Button
-          id="seller-create-btn"
-          onClick={submit}
-          disabled={busy || !itemName.trim()}
-          className="md:w-auto md:min-w-[220px] md:px-8"
-        >
-          {busy ? "Creating…" : "Create order"}
-        </Button>
-      </StickyActionBar>
+        <div className="flex justify-end border-t border-border/60 pt-4">
+          <Button
+            id="seller-create-btn"
+            onClick={submit}
+            disabled={busy || !itemName.trim()}
+            className="md:w-auto md:min-w-[220px] md:px-8"
+          >
+            {busy ? "Creating…" : "Create order"}
+          </Button>
+        </div>
+      </Card>
     </div>
   );
 }

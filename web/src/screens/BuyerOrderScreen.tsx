@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import type { OrderView } from "../lib/types";
-import { Card, MicroLabel, Modal, StatusPill, StickyActionBar } from "../ui/primitives";
+import { Card, MicroLabel, Modal, StatusPill } from "../ui/primitives";
 import { TxStatus, type TxState } from "../ui/TxStatus";
 import { fmtXlm, fmtPhp } from "../lib/money";
 
@@ -62,7 +62,7 @@ export function BuyerOrderScreen({
       : order.sellerAddress;
 
   return (
-    <div className="mx-auto max-w-md px-4 py-8 pb-32 md:max-w-2xl">
+    <div className="mx-auto max-w-md px-4 py-8 md:max-w-2xl">
       <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-primary">Secure order</div>
       <h1 className="mt-2 font-heading text-2xl tracking-tight">{order.itemName}</h1>
       <p className="mt-1 text-sm text-muted-foreground">
@@ -113,32 +113,32 @@ export function BuyerOrderScreen({
 
       <TxStatus state={txState} />
 
-      <StickyActionBar>
+      <div className="mt-4">
         {!connected ? (
           <button
             id="buyer-connect-btn"
             onClick={handleConnect}
             disabled={busy}
-            className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60 md:w-auto md:min-w-[260px] md:px-8"
+            className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
           >
             {busy ? "Connecting…" : "Connect wallet to continue"}
           </button>
         ) : (
-          <div className="w-full space-y-2 md:flex md:w-auto md:flex-col md:items-end">
+          <div className="space-y-2">
             <button
               id="buyer-lock-deposit-btn"
               onClick={() => setConfirmOpen(true)}
               disabled={busy || order.status !== "awaiting_deposit"}
-              className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60 md:w-auto md:min-w-[260px] md:px-8"
+              className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-primary text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
             >
               {busy && txState.kind === "pending" ? "Processing…" : `Leave ${fmtXlm(order.deposit)} deposit`}
             </button>
-            <p className="text-center text-xs text-muted-foreground md:text-right">
+            <p className="text-center text-xs text-muted-foreground">
               Fully refundable — you get it back when you confirm delivery.
             </p>
           </div>
         )}
-      </StickyActionBar>
+      </div>
 
       {/* Compact confirm popup — short, no scrolling. */}
       <Modal open={confirmOpen} onClose={() => setConfirmOpen(false)} title="Leave your deposit?">

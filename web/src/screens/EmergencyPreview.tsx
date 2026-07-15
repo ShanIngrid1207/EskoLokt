@@ -71,7 +71,7 @@ export function EmergencyPreview() {
   const isLast = step === FLOW_STEPS.length - 1;
 
   return (
-    <div className="mx-auto max-w-md px-4 py-8">
+    <div className="mx-auto max-w-md px-4 py-8 md:max-w-2xl">
       {/* Header */}
       <div className="border-b border-border/60 pb-5">
         <div className="flex items-center gap-2">
@@ -86,8 +86,10 @@ export function EmergencyPreview() {
         </p>
       </div>
 
+      {/* How it works + phone demo, side-by-side on desktop */}
+      <div className="mt-6 grid gap-6 md:grid-cols-2 md:items-start">
       {/* How it works summary */}
-      <Card className="mt-6">
+      <Card>
         <MicroLabel>How it works</MicroLabel>
         <ol className="mt-3 space-y-2 text-sm">
           {[
@@ -107,7 +109,7 @@ export function EmergencyPreview() {
       </Card>
 
       {/* Phone mockup + animated flow */}
-      <div className="mt-6 flex flex-col items-center">
+      <div className="flex flex-col items-center">
         <MicroLabel>Interactive demo</MicroLabel>
         <div className="mt-4 w-56 rounded-[2.5rem] border-4 border-foreground/20 bg-foreground/5 p-2 shadow-xl">
           {/* Phone top notch */}
@@ -211,9 +213,12 @@ export function EmergencyPreview() {
           </button>
         </div>
       </div>
+      </div>
 
+      {/* Offline options + status, side-by-side on desktop */}
+      <div className="mt-6 grid gap-3 md:grid-cols-2 md:items-start">
       {/* Offline options section */}
-      <Card className="mt-8">
+      <Card>
         <MicroLabel>Other offline options</MicroLabel>
         <div className="mt-3 space-y-3 text-sm text-muted-foreground">
           <div className="flex gap-3">
@@ -240,7 +245,7 @@ export function EmergencyPreview() {
       </Card>
 
       {/* Coming soon notice */}
-      <Card className="mt-3 border-amber-500/30 bg-amber-500/5">
+      <Card className="border-amber-500/30 bg-amber-500/5">
         <MicroLabel>Production status</MicroLabel>
         <p className="mt-1 text-sm text-muted-foreground">
           The USSD/SMS gateway integration is next-phase. A production version
@@ -248,6 +253,7 @@ export function EmergencyPreview() {
           This preview shows the exact flow customers will experience.
         </p>
       </Card>
+      </div>
     </div>
   );
 }

@@ -414,9 +414,9 @@ export default function App() {
     // Mobile-first: on phones this is edge-to-edge (all desktop styling is md:*).
     // On desktop the app sits in a centered, framed surface on a branded backdrop
     // so it reads as a real app instead of a lonely phone-width strip.
-    <div className="min-h-svh bg-background text-foreground md:bg-gradient-to-b md:from-[hsl(152,32%,97%)] md:to-[hsl(220,18%,94%)]">
+    <div className="min-h-svh bg-background text-foreground md:flex md:min-h-svh md:items-center md:justify-center md:bg-gradient-to-b md:from-[hsl(152,32%,97%)] md:to-[hsl(220,18%,94%)]">
       <div
-        className={`md:mx-auto md:my-8 md:overflow-hidden md:rounded-2xl md:border md:border-border/60 md:bg-background md:shadow-[0_24px_70px_-28px_rgba(16,24,40,0.28)] ${
+        className={`md:my-8 md:w-full md:overflow-hidden md:rounded-2xl md:border md:border-border/60 md:bg-background md:shadow-[0_24px_70px_-28px_rgba(16,24,40,0.28)] ${
           wideRoute ? "md:max-w-5xl" : "md:max-w-2xl"
         }`}
       >
