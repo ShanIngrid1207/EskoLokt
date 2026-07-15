@@ -12,7 +12,7 @@
 //! never sign anything, so the seller must be able to claim alone once time runs out.
 //! Stellar's sub-cent fees + ~5s settlement make escrowing even a tiny deposit viable.
 
-use soroban_sdk::{contract, contractimpl, contracttype, token, Address, Env};
+use soroban_sdk::{contract, contractimpl, contracttype, token, Address, Bytes, BytesN, Env};
 
 /// Keys for everything this contract stores.
 #[derive(Clone)]
@@ -42,6 +42,7 @@ pub struct Order {
     pub token: Address,  // the asset contract used (e.g. USDC SAC address)
     pub amount: i128,    // the deposit escrowed
     pub deadline: u64,   // unix seconds; at/after this the seller may claim
+    pub code_hash: BytesN<32>, // sha256 of the delivery code the buyer reveals to confirm
     pub status: Status,  // current lifecycle state
 }
 
@@ -61,6 +62,7 @@ impl CodLock {
         token: Address,
         amount: i128,
         deadline: u64,
+        code_hash: BytesN<32>,
     ) -> u64 {
         buyer.require_auth();
         assert!(amount > 0, "amount must be positive");
@@ -85,6 +87,7 @@ impl CodLock {
             token,
             amount,
             deadline,
+            code_hash,
             status: Status::Funded,
         };
         env.storage().persistent().set(&DataKey::Order(id), &order);
@@ -94,15 +97,21 @@ impl CodLock {
 
     /// Buyer confirms the parcel arrived. Returns the deposit to the buyer.
     /// The status guard makes this idempotent-safe: a resolved order can never pay out twice.
-    pub fn confirm_delivery(env: Env, order_id: u64) {
+    pub fn confirm_delivery(env: Env, order_id: u64, code: Bytes) {
         let mut order: Order = env
             .storage()
             .persistent()
             .get(&DataKey::Order(order_id))
             .expect("order not found");
 
-        order.buyer.require_auth(); // only the buyer confirms their own delivery
         assert!(order.status == Status::Funded, "order not in funded state");
+
+        // Delivery proof: the revealed code must hash to the stored commitment.
+        // This makes the code enforced ON-CHAIN, not just in the app/database.
+        let computed = env.crypto().sha256(&code).to_bytes();
+        assert!(computed == order.code_hash, "wrong delivery code");
+
+        order.buyer.require_auth(); // only the buyer confirms their own delivery
 
         // Return the deposit to the buyer from the contract's escrow balance.
         token::Client::new(&env, &order.token).transfer(
