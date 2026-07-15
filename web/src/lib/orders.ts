@@ -30,6 +30,14 @@ export async function updateStatus(ref: string, status: OrderStatus): Promise<vo
   if (error) throw new Error(error.message);
 }
 
+/** Give a not-yet-paid order a fresh deadline so the same link can be reused
+ *  instead of creating a new order. Only meaningful before the buyer pays
+ *  (the on-chain deadline is set from this value at payment time). */
+export async function renewOrderDeadline(ref: string, deadline: string): Promise<void> {
+  const { error } = await supabase.from("orders").update({ deadline }).eq("ref", ref);
+  if (error) throw new Error(error.message);
+}
+
 export async function verifyDeliveryCode(ref: string, code: string): Promise<boolean> {
   const row = await getOrderByRef(ref);
   if (!row) return false;

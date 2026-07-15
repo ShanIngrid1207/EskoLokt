@@ -41,7 +41,7 @@ export function ConnectScreen({
     setFundsMsg(null);
     try {
       await onGetTestFunds();
-      setFundsMsg("Test XLM funded ✓");
+      setFundsMsg("Free test money added ✓");
     } catch (e) {
       setFundsMsg(e instanceof Error ? e.message : "Failed.");
     } finally {
@@ -69,17 +69,16 @@ export function ConnectScreen({
 
   return (
     <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center px-4 py-12">
-      <ScreenHeader crumb="Wallet" title="Connect wallet" />
+      <ScreenHeader crumb="Get started" title="Connect your wallet" />
 
       {!connected ? (
         <Card className="mt-8 w-full text-center">
-          {/* Freighter logo placeholder */}
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
             <WalletIcon />
           </div>
           <p className="text-sm text-muted-foreground">
-            Connect your Freighter wallet to lock deposits and confirm
-            deliveries on Stellar Testnet.
+            Your wallet is how the small refundable deposit is held and returned —
+            no bank needed. Connect it to get started.
           </p>
           <Button
             id="connect-wallet-btn"
@@ -94,7 +93,7 @@ export function ConnectScreen({
         <Card className="mt-8 w-full space-y-4">
           {/* Address display */}
           <div className="rounded-lg bg-emerald-500/8 px-3 py-2 text-center">
-            <MicroLabel>Connected address</MicroLabel>
+            <MicroLabel>Your account</MicroLabel>
             <div className="mt-1 font-mono text-xs">{truncate(address)}</div>
           </div>
 
@@ -105,7 +104,7 @@ export function ConnectScreen({
               onClick={handleGetTestFunds}
               disabled={fundsBusy}
             >
-              {fundsBusy ? "Funding…" : "Get test funds"}
+              {fundsBusy ? "Adding…" : "Get free test money"}
             </Button>
             {fundsMsg && (
               <p
@@ -149,7 +148,7 @@ export function ConnectScreen({
           )}
 
           <p className="text-center text-xs text-muted-foreground">
-            These actions only affect Stellar Testnet — no real money is involved.
+            This is a test — no real money is involved.
           </p>
         </Card>
       )}

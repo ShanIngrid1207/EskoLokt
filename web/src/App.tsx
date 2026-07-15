@@ -19,6 +19,7 @@ import {
   attachBuyer,
   updateStatus,
   verifyDeliveryCode,
+  renewOrderDeadline,
   listOrdersForAddress,
   subscribeToOrder,
 } from "./lib/orders";
@@ -32,8 +33,14 @@ import { SellerCreateScreen } from "./screens/SellerCreateScreen";
 import { BuyerOrderScreen } from "./screens/BuyerOrderScreen";
 import { OrderDetailScreen } from "./screens/OrderDetailScreen";
 import { PracticeScreen } from "./screens/PracticeScreen";
+import { GuideScreen } from "./screens/GuideScreen";
 
-type Route = "connect" | "home" | "sell" | "buyOrder" | "detail" | "practice";
+type Route = "connect" | "home" | "sell" | "buyOrder" | "detail" | "practice" | "guide";
+
+// Show the step-by-step guide the first time a seller signs in.
+const SEEN_GUIDE_KEY = "eskolokt.seenGuide";
+const hasSeenGuide = () =>
+  typeof window !== "undefined" && window.localStorage.getItem(SEEN_GUIDE_KEY) === "1";
 
 export default function App() {
   const [address, setAddress] = useState<string | null>(() => wallet.getAddress());
@@ -86,12 +93,17 @@ export default function App() {
     if (row) setOrder(rowToView(row));
   }
 
+  // After signing in, first-timers see the how-it-works guide, then home.
+  function enterApp() {
+    setRoute(hasSeenGuide() ? "home" : "guide");
+  }
+
   // ── Wallet ──────────────────────────────────────────────────────────────────
   async function handleConnect() {
     const a = await wallet.connect();
     setAddress(a);
     await loadMyOrders(a);
-    setRoute((r) => (r === "connect" ? "home" : r));
+    setRoute((r) => (r === "connect" ? (hasSeenGuide() ? "home" : "guide") : r));
   }
 
   async function handleGetTestFunds() {
@@ -186,6 +198,14 @@ export default function App() {
     await refreshOrder(order.ref);
   }
 
+  // Give a not-yet-paid order a fresh 24-hour window so the same link keeps working.
+  async function handleRenewOrder(): Promise<void> {
+    if (!order) throw new Error("Order not loaded.");
+    const newDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    await renewOrderDeadline(order.ref, newDeadline);
+    await refreshOrder(order.ref);
+  }
+
   async function handleClaim(): Promise<{ hash: string }> {
     if (!order) throw new Error("Order not loaded.");
     const pub = wallet.getAddress();
@@ -270,7 +290,7 @@ export default function App() {
           address={address ?? ""}
           onConnect={handleConnect}
           onGetTestFunds={handleGetTestFunds}
-          onContinue={() => setRoute("home")}
+          onContinue={enterApp}
         />
       )}
 
@@ -280,6 +300,16 @@ export default function App() {
           orders={myOrders}
           onSell={() => setRoute("sell")}
           onOpenOrder={openOrder}
+          onGuide={() => setRoute("guide")}
+        />
+      )}
+
+      {route === "guide" && (
+        <GuideScreen
+          onDone={() => {
+            if (typeof window !== "undefined") window.localStorage.setItem(SEEN_GUIDE_KEY, "1");
+            setRoute("home");
+          }}
           onPractice={() => setRoute("practice")}
         />
       )}
@@ -304,6 +334,7 @@ export default function App() {
           onConfirmDelivery={handleConfirmDelivery}
           onMarkShipped={handleMarkShipped}
           onClaim={handleClaim}
+          onRenew={handleRenewOrder}
         />
       )}
       </div>

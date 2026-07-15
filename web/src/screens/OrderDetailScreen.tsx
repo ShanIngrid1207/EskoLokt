@@ -49,18 +49,47 @@ export function OrderDetailScreen({
   onConfirmDelivery,
   onMarkShipped,
   onClaim,
+  onRenew,
 }: {
   order: OrderView;
   role: "buyer" | "seller";
   onConfirmDelivery: (code: string) => Promise<{ hash: string }>;
   onMarkShipped: () => Promise<void>;
   onClaim: () => Promise<{ hash: string }>;
+  onRenew: () => Promise<void>;
 }) {
   const [deliveryCode, setDeliveryCode] = useState("");
   const [txState, setTxState] = useState<TxState>({ kind: "idle" });
   const [busy, setBusy] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const deadlinePassed = new Date(order.deadline) < new Date();
+  const shareUrl = `${window.location.origin}${window.location.pathname}?order=${order.ref}`;
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* clipboard unavailable */
+    }
+  };
+
+  const handleRenew = async () => {
+    setBusy(true);
+    setTxState({ kind: "idle" });
+    try {
+      await onRenew();
+    } catch (e) {
+      setTxState({
+        kind: "error",
+        message: e instanceof Error ? e.message : "Could not renew.",
+      });
+    } finally {
+      setBusy(false);
+    }
+  };
   const stepIndex = currentStepIndex(order.status);
 
   // ─── Action handlers ────────────────────────────────────────────────────────
@@ -231,6 +260,24 @@ export function OrderDetailScreen({
               </Button>
             </div>
           )}
+
+        {/* Seller: order not paid yet — re-share the same link, renew if it expired */}
+        {role === "seller" && order.status === "awaiting_deposit" && (
+          <div className="space-y-2">
+            {deadlinePassed && (
+              <p className="rounded-lg bg-amber-500/10 px-3 py-2 text-center text-sm text-amber-700">
+                The time ran out before your buyer paid. Give them more time and re-send this same
+                link — no need to make a new order.
+              </p>
+            )}
+            <Button id="seller-copy-link-btn" variant="outline" onClick={copyLink}>
+              {copied ? "Link copied ✓" : "Copy the link to send again"}
+            </Button>
+            <Button id="seller-renew-btn" onClick={handleRenew} disabled={busy}>
+              {busy ? "Giving more time…" : "Give the buyer more time"}
+            </Button>
+          </div>
+        )}
 
         {/* Seller: mark shipped when funded */}
         {role === "seller" && order.status === "funded" && (
