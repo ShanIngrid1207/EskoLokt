@@ -1,9 +1,240 @@
-import { useMemo, useState } from "react";
-import { ORDERS, STATUS_META, summarize, VOLUME_BUCKETS } from "../data/orders";
+import { useMemo, useState, useRef, useEffect, useCallback } from "react";
+import { ORDERS, STATUS_META, summarize, VOLUME_BUCKETS, CHANNEL_SERIES } from "../data/orders";
 import type { Order, OrderStatus } from "../data/orders";
 import { MiniBarChart } from "./MiniBarChart";
 import { IconSearch, IconChevronDown, IconExternal } from "./icons";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+
+// ─── Step-line chart: cumulative orders per channel ───────────────────────────
+// Pure SVG, no library. Each series draws a step-path (H then V segments)
+// with a draw-in animation + hover tooltip showing all values at cursor.
+function StepLineChart({
+  series,
+  labels,
+}: {
+  series: { name: string; color: string; steps: number[] }[];
+  labels: string[];
+}) {
+  const W = 400;
+  const H = 180;
+  const padL = 26;
+  const padB = 26;
+  const padT = 14;
+  const padR = 10;
+  const maxVal = Math.max(1, ...series.flatMap((s) => s.steps));
+  const innerW = W - padL - padR;
+  const innerH = H - padB - padT;
+  const xAt = useCallback(
+    (i: number) => padL + (i / (labels.length - 1)) * innerW,
+    [labels.length, innerW],
+  );
+  const yAt = useCallback(
+    (v: number) => padT + innerH - (v / maxVal) * innerH,
+    [maxVal, innerH],
+  );
+
+  const buildStepPath = useCallback(
+    (steps: number[]) => {
+      if (steps.length === 0) return "";
+      let d = `M ${xAt(0)} ${yAt(steps[0])}`;
+      for (let i = 1; i < steps.length; i++) {
+        d += ` H ${xAt(i)} V ${yAt(steps[i])}`;
+      }
+      return d;
+    },
+    [xAt, yAt],
+  );
+
+  const ticks = [0, Math.round(maxVal / 2), maxVal].filter(
+    (v, i, arr) => arr.indexOf(v) === i,
+  );
+
+  // Path length measurement for draw animation
+  const pathRefs = useRef<(SVGPathElement | null)[]>([]);
+  const [pathLengths, setPathLengths] = useState<number[]>([]);
+
+  useEffect(() => {
+    const lengths = pathRefs.current.map((el) =>
+      el ? el.getTotalLength() : 1000,
+    );
+    setPathLengths(lengths);
+  }, [series]);
+
+  // Hover state
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null);
+  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const scaleX = W / rect.width;
+    const svgX = (e.clientX - rect.left) * scaleX;
+    // Find nearest label index
+    let nearest = 0;
+    let minDist = Infinity;
+    for (let i = 0; i < labels.length; i++) {
+      const dist = Math.abs(svgX - xAt(i));
+      if (dist < minDist) {
+        minDist = dist;
+        nearest = i;
+      }
+    }
+    setHoverIdx(nearest);
+    setTooltipPos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
+  return (
+    <div style={{ position: "relative" }}>
+      <svg
+        ref={svgRef}
+        className="chart-svg"
+        viewBox={`0 0 ${W} ${H}`}
+        role="img"
+        aria-label="Channel sales over time"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => setHoverIdx(null)}
+      >
+        {/* y gridlines */}
+        {ticks.map((t) => {
+          const y = yAt(t);
+          return (
+            <g key={t}>
+              <line x1={padL} y1={y} x2={W - padR} y2={y} className="grid-line" />
+              <text x={padL - 6} y={y + 4} className="axis-label" textAnchor="end">
+                {t}
+              </text>
+            </g>
+          );
+        })}
+
+        {/* x labels */}
+        {labels.map((label, i) => (
+          <text
+            key={label}
+            x={xAt(i)}
+            y={H - 6}
+            className="axis-label"
+            textAnchor="middle"
+          >
+            {label}
+          </text>
+        ))}
+
+        {/* Vertical hover line */}
+        {hoverIdx !== null && (
+          <line
+            x1={xAt(hoverIdx)}
+            y1={padT}
+            x2={xAt(hoverIdx)}
+            y2={padT + innerH}
+            stroke="var(--border-strong)"
+            strokeWidth="1"
+            strokeDasharray="4 3"
+          />
+        )}
+
+        {/* step-line per series with draw animation */}
+        {series.map((s, idx) => {
+          const len = pathLengths[idx] ?? 1000;
+          return (
+            <path
+              key={s.name}
+              ref={(el) => { pathRefs.current[idx] = el; }}
+              d={buildStepPath(s.steps)}
+              fill="none"
+              stroke={s.color}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="step-path"
+              style={{
+                ["--path-length" as string]: len,
+                ["--line-delay" as string]: `${idx * 0.15}s`,
+                strokeDasharray: len,
+                strokeDashoffset: len,
+              } as React.CSSProperties}
+            />
+          );
+        })}
+
+        {/* Hover dots at intersection */}
+        {hoverIdx !== null &&
+          series.map((s) => (
+            <circle
+              key={s.name + "-hover"}
+              cx={xAt(hoverIdx)}
+              cy={yAt(s.steps[hoverIdx])}
+              r={4}
+              fill={s.color}
+              stroke="var(--surface)"
+              strokeWidth={2}
+            />
+          ))}
+
+        {/* Endpoint dots (always visible) */}
+        {series.map((s) => {
+          const last = s.steps.length - 1;
+          return (
+            <circle
+              key={s.name + "-dot"}
+              cx={xAt(last)}
+              cy={yAt(s.steps[last])}
+              r={3.5}
+              fill={s.color}
+            />
+          );
+        })}
+      </svg>
+
+      {/* Tooltip */}
+      {hoverIdx !== null && (
+        <div
+          style={{
+            position: "absolute",
+            left: tooltipPos.x,
+            top: tooltipPos.y - 16,
+            transform: "translate(-50%, -100%)",
+            background: "var(--text)",
+            color: "var(--bg)",
+            fontFamily: "var(--mono)",
+            fontSize: "11px",
+            fontWeight: 600,
+            padding: "7px 11px",
+            borderRadius: "7px",
+            whiteSpace: "nowrap",
+            pointerEvents: "none",
+            boxShadow: "var(--shadow-md)",
+            zIndex: 50,
+            display: "flex",
+            flexDirection: "column",
+            gap: "3px",
+          }}
+        >
+          <div style={{ marginBottom: 2, opacity: 0.7 }}>{labels[hoverIdx]}</div>
+          {series.map((s) => (
+            <div key={s.name} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span
+                style={{
+                  width: 7,
+                  height: 7,
+                  borderRadius: "50%",
+                  background: s.color,
+                  flexShrink: 0,
+                }}
+              />
+              <span>{s.name}: {s.steps[hoverIdx]}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const CONTRACT_URL =
   "https://stellar.expert/explorer/testnet/contract/CBHTZBTBBLKR56GO2EICGJTMJE6FUFIXTBMSG4GIMB3NVVXZUBDUPGEN";
@@ -164,7 +395,7 @@ export function OrdersDashboard() {
 
         {/* Main */}
         <div className="dash-main">
-          <div className="cards-row">
+          <div className="cards-row-3">
             {/* Summary breakdown */}
             <section className="panel summary">
               <div className="summary-total">
@@ -191,13 +422,38 @@ export function OrdersDashboard() {
               </ul>
             </section>
 
-            {/* Chart */}
+            {/* Net Revenue bar chart */}
             <section className="panel chart">
               <div className="panel-head">
-                <span>Orders over time</span>
-                <span className="muted-xs">Last 24 hours</span>
+                <span>Net revenue</span>
+                <span className="chart-delta-badge">↗ 12.4%</span>
               </div>
+              <div className="chart-panel-subtitle">Daily orders, last 24 hours.</div>
               <MiniBarChart data={VOLUME_BUCKETS} />
+            </section>
+
+            {/* Channel Sales step-line chart */}
+            <section className="panel chart">
+              <div className="panel-head">
+                <span>Channel sales</span>
+                <span className="chart-delta-badge">↗ 58.3%</span>
+              </div>
+              <div className="chart-panel-subtitle">Orders by shop, last 24 hours.</div>
+              <StepLineChart
+                series={CHANNEL_SERIES}
+                labels={VOLUME_BUCKETS.map((b) => b.label)}
+              />
+              <div className="chart-legend">
+                {CHANNEL_SERIES.map((s) => (
+                  <div key={s.name} className="chart-legend-item">
+                    <div
+                      className="chart-legend-dot"
+                      style={{ background: s.color }}
+                    />
+                    {s.name}
+                  </div>
+                ))}
+              </div>
             </section>
           </div>
 

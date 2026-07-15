@@ -69,5 +69,14 @@ export const VOLUME_BUCKETS: { label: string; count: number }[] = [
   { label: "12:00", count: 2 },
   { label: "14:00", count: 3 },
   { label: "16:00", count: 1 },
-  { label: "now", count: 2 },
+  { label: "now",   count: 2 },
+];
+
+// Cumulative order counts per shop, aligned to VOLUME_BUCKETS time slots.
+// Powers the "Channel sales" step-line chart.
+export const CHANNEL_SERIES: { name: string; color: string; steps: number[] }[] = [
+  { name: "Joy's Closet",   color: "#3b82f6", steps: [0, 1, 2, 3, 4, 4, 5] },
+  { name: "Manila Threads", color: "#10b981", steps: [0, 1, 1, 2, 2, 3, 3] },
+  { name: "Cebu Finds",     color: "#f59e0b", steps: [0, 0, 1, 1, 2, 3, 3] },
+  { name: "Davao Style",    color: "#8b5cf6", steps: [0, 0, 0, 1, 1, 1, 2] },
 ];
