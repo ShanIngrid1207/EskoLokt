@@ -26,6 +26,8 @@ import {
 import { hashCode } from "./lib/crypto";
 import { rowToView, genRef, genDeliveryCode } from "./lib/view";
 import { FRIENDBOT_URL } from "./lib/constants";
+import { EmergencyPreview } from "./screens/EmergencyPreview";
+import { toast } from "./ui/toast";
 import type { OrderView } from "./lib/types";
 import { ConnectScreen } from "./screens/ConnectScreen";
 import { HomeScreen } from "./screens/HomeScreen";
@@ -36,7 +38,7 @@ import { PracticeScreen } from "./screens/PracticeScreen";
 import { GuideScreen } from "./screens/GuideScreen";
 import { SellerDashboard } from "./screens/SellerDashboard";
 
-type Route = "connect" | "home" | "sell" | "buyOrder" | "detail" | "practice" | "guide";
+type Route = "connect" | "home" | "sell" | "buyOrder" | "detail" | "practice" | "guide" | "offline";
 
 // Show the step-by-step guide the first time a seller signs in.
 const SEEN_GUIDE_KEY = "eskolokt.seenGuide";
@@ -59,6 +61,25 @@ export default function App() {
   const [role, setRole] = useState<"buyer" | "seller">("buyer");
   const [myOrders, setMyOrders] = useState<OrderView[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [online, setOnline] = useState(() => (typeof navigator !== "undefined" ? navigator.onLine : true));
+
+  // Offline awareness: the app (a PWA) keeps working; tell the user what still works.
+  useEffect(() => {
+    const goOffline = () => {
+      setOnline(false);
+      toast.info("You're offline — Esko Lokt still works. Payments send once you're back.");
+    };
+    const goOnline = () => {
+      setOnline(true);
+      toast.success("Back online");
+    };
+    window.addEventListener("offline", goOffline);
+    window.addEventListener("online", goOnline);
+    return () => {
+      window.removeEventListener("offline", goOffline);
+      window.removeEventListener("online", goOnline);
+    };
+  }, []);
 
   // Initial route: a shared ?order=<ref> link means "buyer", otherwise home/connect.
   useEffect(() => {
@@ -113,6 +134,7 @@ export default function App() {
     const a = await wallet.connect();
     setAddress(a);
     await loadMyOrders(a);
+    toast.success("Wallet connected");
     setRoute((r) => (r === "connect" ? (hasSeenGuide() ? "home" : "guide") : r));
   }
 
@@ -121,6 +143,7 @@ export default function App() {
     if (!a) throw new Error("Connect a wallet first.");
     const res = await fetch(`${FRIENDBOT_URL}?addr=${encodeURIComponent(a)}`);
     if (!res.ok) throw new Error("Friendbot: account may already be funded — check your balance.");
+    toast.success("Free test money added");
   }
 
   // ── Seller ────────────────────────────────────────────────────────────────────
@@ -145,6 +168,7 @@ export default function App() {
     });
     const shareUrl = `${window.location.origin}${window.location.pathname}?order=${ref}`;
     await loadMyOrders(a);
+    toast.success("Order created — now share the link with your buyer");
     return { ref, deliveryCode: code, shareUrl };
   }
 
@@ -159,19 +183,26 @@ export default function App() {
     const codeHashHex = row?.delivery_code_hash;
     if (!codeHashHex) throw new Error("Order is missing its delivery-code commitment.");
     const deadlineUnix = Math.floor(new Date(order.deadline).getTime() / 1000);
-    const { orderId, hash } = await createOrder({
-      buyer,
-      seller: order.sellerAddress,
-      amountXlm: order.deposit,
-      deadlineUnix,
-      codeHashHex,
-      sign: wallet.signTransaction,
-    });
-    await attachBuyer(order.ref, buyer, Number(orderId));
-    await refreshOrder(order.ref);
-    setRole("buyer");
-    setRoute("detail");
-    return { hash };
+    const tid = toast.loading("Setting aside your deposit…");
+    try {
+      const { orderId, hash } = await createOrder({
+        buyer,
+        seller: order.sellerAddress,
+        amountXlm: order.deposit,
+        deadlineUnix,
+        codeHashHex,
+        sign: wallet.signTransaction,
+      });
+      await attachBuyer(order.ref, buyer, Number(orderId));
+      await refreshOrder(order.ref);
+      toast.update(tid, "success", "Deposit set aside — you're protected");
+      setRole("buyer");
+      setRoute("detail");
+      return { hash };
+    } catch (e) {
+      toast.update(tid, "error", e instanceof Error ? e.message : "Couldn't set aside the deposit");
+      throw e;
+    }
   }
 
   async function onChainOrderId(ref: string): Promise<string> {
@@ -191,21 +222,29 @@ export default function App() {
     const orderId = await onChainOrderId(order.ref);
     // Pass the code itself — the contract hashes it and checks against the on-chain
     // commitment, so a wrong code is rejected by the chain, not just the database.
-    const { hash } = await confirmDelivery({
-      publicKey: pub,
-      orderId,
-      code: normalized,
-      sign: wallet.signTransaction,
-    });
-    await updateStatus(order.ref, "delivered");
-    await refreshOrder(order.ref);
-    return { hash };
+    const tid = toast.loading("Confirming delivery…");
+    try {
+      const { hash } = await confirmDelivery({
+        publicKey: pub,
+        orderId,
+        code: normalized,
+        sign: wallet.signTransaction,
+      });
+      await updateStatus(order.ref, "delivered");
+      await refreshOrder(order.ref);
+      toast.update(tid, "success", "Delivered — the deposit went back to your buyer");
+      return { hash };
+    } catch (e) {
+      toast.update(tid, "error", e instanceof Error ? e.message : "Couldn't confirm delivery");
+      throw e;
+    }
   }
 
   async function handleMarkShipped(): Promise<void> {
     if (!order) throw new Error("Order not loaded.");
     await updateStatus(order.ref, "shipped");
     await refreshOrder(order.ref);
+    toast.success("Marked as on the way");
   }
 
   // Give a not-yet-paid order a fresh 24-hour window so the same link keeps working.
@@ -214,6 +253,7 @@ export default function App() {
     const newDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
     await renewOrderDeadline(order.ref, newDeadline);
     await refreshOrder(order.ref);
+    toast.success("Added more time — re-send the link to your buyer");
   }
 
   async function handleClaim(): Promise<{ hash: string }> {
@@ -221,10 +261,17 @@ export default function App() {
     const pub = wallet.getAddress();
     if (!pub) throw new Error("Connect a wallet first.");
     const orderId = await onChainOrderId(order.ref);
-    const { hash } = await claimExpired({ publicKey: pub, orderId, sign: wallet.signTransaction });
-    await updateStatus(order.ref, "no_show");
-    await refreshOrder(order.ref);
-    return { hash };
+    const tid = toast.loading("Collecting the deposit…");
+    try {
+      const { hash } = await claimExpired({ publicKey: pub, orderId, sign: wallet.signTransaction });
+      await updateStatus(order.ref, "no_show");
+      await refreshOrder(order.ref);
+      toast.update(tid, "success", "Deposit collected — it's yours");
+      return { hash };
+    } catch (e) {
+      toast.update(tid, "error", e instanceof Error ? e.message : "Couldn't collect the deposit");
+      throw e;
+    }
   }
 
   // ── Navigation ────────────────────────────────────────────────────────────────
@@ -252,7 +299,7 @@ export default function App() {
     }
   }
 
-  const showBack = route === "sell" || route === "detail";
+  const showBack = route === "sell" || route === "detail" || route === "offline";
   const wideRoute = false;
 
   // Design previews (no login): /?preview=dashboard | guide
@@ -266,6 +313,7 @@ export default function App() {
         onNewOrder={() => {}}
         onOpenOrder={() => {}}
         onGuide={() => {}}
+        onOffline={() => {}}
       />
     );
   }
@@ -322,12 +370,19 @@ export default function App() {
             onNewOrder={() => setRoute("sell")}
             onOpenOrder={openOrder}
             onGuide={() => setRoute("guide")}
+            onOffline={() => setRoute("offline")}
           />
         </div>
         <div className="min-h-svh bg-background text-foreground md:hidden">
           <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border/60 bg-background/85 px-4 py-2.5 backdrop-blur">
             <span className="font-heading text-sm tracking-tight">EskoLokt</span>
-            <span className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-border/70 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+            <button
+              onClick={() => setRoute("offline")}
+              className="ml-auto text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+            >
+              Pay by text
+            </button>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
               <span className="size-1.5 rounded-full bg-primary" /> Test mode
             </span>
           </header>
@@ -396,6 +451,8 @@ export default function App() {
       )}
 
       {route === "practice" && <PracticeScreen onBack={() => setRoute("home")} />}
+
+      {route === "offline" && <EmergencyPreview />}
 
       {route === "sell" && <SellerCreateScreen onCreate={handleCreate} />}
 

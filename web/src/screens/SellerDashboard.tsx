@@ -22,12 +22,14 @@ export function SellerDashboard({
   onNewOrder,
   onOpenOrder,
   onGuide,
+  onOffline,
 }: {
   address: string;
   orders: OrderView[];
   onNewOrder: () => void;
   onOpenOrder: (ref: string) => void;
   onGuide: () => void;
+  onOffline: () => void;
 }) {
   const [filter, setFilter] = useState<Filter>("all");
 
@@ -114,6 +116,7 @@ export function SellerDashboard({
             <SideItem active icon={<HomeIcon />} label="Dashboard" />
             <SideItem icon={<InboxIcon />} label="New order" onClick={onNewOrder} />
             <SideItem icon={<InfoIcon />} label="How it works" onClick={onGuide} />
+            <SideItem icon={<PhoneIcon />} label="Pay by text (offline)" onClick={onOffline} />
           </nav>
 
           <SidebarLabel>Orders</SidebarLabel>
@@ -470,6 +473,13 @@ function InfoIcon() {
   return (
     <svg viewBox="0 0 24 24" className={svg} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
       <circle cx="12" cy="12" r="9" /><path d="M12 11v5" /><path d="M12 8h.01" />
+    </svg>
+  );
+}
+function PhoneIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className={svg} fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <rect x="7" y="2.5" width="10" height="19" rx="2.5" /><path d="M11 18.5h2" />
     </svg>
   );
 }

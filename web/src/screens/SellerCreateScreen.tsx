@@ -6,6 +6,7 @@
 import { useState, useEffect } from "react";
 import QRCode from "qrcode";
 import { Button, Card, MicroLabel, ScreenHeader, StickyActionBar } from "../ui/primitives";
+import { toast } from "../ui/toast";
 
 type Created = { ref: string; deliveryCode: string; shareUrl: string };
 
@@ -75,7 +76,14 @@ export function SellerCreateScreen({
         <Card className="mt-3">
           <MicroLabel>Or send this link</MicroLabel>
           <div className="mt-1 truncate font-mono text-xs">{done.shareUrl}</div>
-          <Button variant="outline" className="mt-3" onClick={() => navigator.clipboard.writeText(done.shareUrl)}>
+          <Button
+            variant="outline"
+            className="mt-3"
+            onClick={() => {
+              navigator.clipboard.writeText(done.shareUrl);
+              toast.info("Link copied — send it to your buyer");
+            }}
+          >
             Copy link
           </Button>
         </Card>
