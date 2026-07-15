@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import QRCode from "qrcode";
 import { Button, Card, MicroLabel, ScreenHeader, StickyActionBar } from "../ui/primitives";
 import { toast } from "../ui/toast";
+import { fmtPhp } from "../lib/money";
 
 type Created = { ref: string; deliveryCode: string; shareUrl: string };
 
@@ -58,37 +59,46 @@ export function SellerCreateScreen({
   // ─── Success panel ──────────────────────────────────────────────────────────
   if (done) {
     return (
-      <div className="mx-auto max-w-md px-4 py-8">
+      <div className="mx-auto max-w-md px-4 py-8 md:max-w-2xl">
         <ScreenHeader crumb="Order created" title="Share this with your buyer" />
 
-        <Card className="mt-6 text-center">
-          <MicroLabel>Delivery code (write on the parcel)</MicroLabel>
-          <div className="mt-1 font-mono text-3xl tracking-[0.3em] tabular-nums">{done.deliveryCode}</div>
-        </Card>
+        {/* Desktop: QR on the left, code + link stacked on the right. */}
+        <div className="mt-6 grid gap-3 md:grid-cols-2 md:items-start">
+          {qrDataUrl && (
+            <Card className="flex flex-col items-center gap-2 md:row-span-2">
+              <MicroLabel>Buyer scans this</MicroLabel>
+              <img
+                src={qrDataUrl}
+                alt="Order QR code"
+                className="mt-1 rounded-lg md:h-56 md:w-56"
+                width={170}
+                height={170}
+              />
+            </Card>
+          )}
 
-        {qrDataUrl && (
-          <Card className="mt-3 flex flex-col items-center gap-2">
-            <MicroLabel>Buyer scans this</MicroLabel>
-            <img src={qrDataUrl} alt="Order QR code" className="mt-1 rounded-lg" width={170} height={170} />
+          <Card className="text-center md:text-left">
+            <MicroLabel>Delivery code (write on the parcel)</MicroLabel>
+            <div className="mt-1 font-mono text-3xl tracking-[0.3em] tabular-nums">{done.deliveryCode}</div>
           </Card>
-        )}
 
-        <Card className="mt-3">
-          <MicroLabel>Or send this link</MicroLabel>
-          <div className="mt-1 truncate font-mono text-xs">{done.shareUrl}</div>
-          <Button
-            variant="outline"
-            className="mt-3"
-            onClick={() => {
-              navigator.clipboard.writeText(done.shareUrl);
-              toast.info("Link copied — send it to your buyer");
-            }}
-          >
-            Copy link
-          </Button>
-        </Card>
+          <Card>
+            <MicroLabel>Or send this link</MicroLabel>
+            <div className="mt-1 truncate font-mono text-xs">{done.shareUrl}</div>
+            <Button
+              variant="outline"
+              className="mt-3"
+              onClick={() => {
+                navigator.clipboard.writeText(done.shareUrl);
+                toast.info("Link copied — send it to your buyer");
+              }}
+            >
+              Copy link
+            </Button>
+          </Card>
+        </div>
 
-        <div className="mt-4 text-center">
+        <div className="mt-4 text-center md:text-left">
           <button
             className="text-sm text-muted-foreground underline underline-offset-2 hover:text-foreground"
             onClick={() => {
@@ -106,7 +116,7 @@ export function SellerCreateScreen({
 
   // ─── Create form ────────────────────────────────────────────────────────────
   return (
-    <div className="mx-auto max-w-md px-4 py-8 pb-28">
+    <div className="mx-auto max-w-md px-4 py-8 pb-28 md:max-w-2xl">
       <ScreenHeader
         crumb="New order"
         title="Create an order"
@@ -114,34 +124,43 @@ export function SellerCreateScreen({
       />
 
       <Card className="mt-6 space-y-5">
-        <label className="block">
-          <MicroLabel>What are you selling?</MicroLabel>
-          <input
-            id="seller-item-name"
-            value={itemName}
-            onChange={(e) => setItemName(e.target.value)}
-            placeholder="e.g. Blue cotton tee"
-            className="mt-1.5 h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors focus:border-ring"
-          />
-        </label>
+        {/* Item + deposit sit side-by-side on desktop, stacked on mobile. */}
+        <div className="grid gap-5 md:grid-cols-2">
+          <label className="block">
+            <MicroLabel>What are you selling?</MicroLabel>
+            <input
+              id="seller-item-name"
+              value={itemName}
+              onChange={(e) => setItemName(e.target.value)}
+              placeholder="e.g. Blue cotton tee"
+              className="mt-1.5 h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors focus:border-ring"
+            />
+          </label>
 
-        <label className="block">
-          <MicroLabel>Refundable deposit</MicroLabel>
-          <input
-            id="seller-deposit"
-            value={deposit}
-            onChange={(e) => setDeposit(e.target.value.replace(/[^\d.]/g, ""))}
-            inputMode="decimal"
-            className="mt-1.5 h-11 w-full rounded-lg border border-input bg-background px-3 font-mono text-sm tabular-nums outline-none transition-colors focus:border-ring"
-          />
-          <p className="mt-1.5 text-xs text-muted-foreground">
-            A small hold — it comes back to your buyer on delivery.
-          </p>
-        </label>
+          <label className="block">
+            <MicroLabel>Refundable deposit</MicroLabel>
+            <div className="relative mt-1.5">
+              <input
+                id="seller-deposit"
+                value={deposit}
+                onChange={(e) => setDeposit(e.target.value.replace(/[^\d.]/g, ""))}
+                inputMode="decimal"
+                className="h-11 w-full rounded-lg border border-input bg-background pl-3 pr-16 font-mono text-sm tabular-nums outline-none transition-colors focus:border-ring"
+              />
+              <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center font-mono text-xs font-medium text-muted-foreground">
+                XLM
+              </span>
+            </div>
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              About <span className="font-medium text-foreground">{fmtPhp(deposit)}</span> — a small hold that
+              comes back to your buyer on delivery.
+            </p>
+          </label>
+        </div>
 
         <div>
           <MicroLabel>How long does your buyer have to pay?</MicroLabel>
-          <div className="mt-2 grid grid-cols-3 gap-2">
+          <div className="mt-2 grid grid-cols-3 gap-2 md:grid-cols-6">
             {TIME_OPTIONS.map((t) => (
               <button
                 key={t.minutes}
@@ -166,7 +185,12 @@ export function SellerCreateScreen({
       </Card>
 
       <StickyActionBar>
-        <Button id="seller-create-btn" onClick={submit} disabled={busy || !itemName.trim()}>
+        <Button
+          id="seller-create-btn"
+          onClick={submit}
+          disabled={busy || !itemName.trim()}
+          className="md:w-auto md:min-w-[220px] md:px-8"
+        >
           {busy ? "Creating…" : "Create order"}
         </Button>
       </StickyActionBar>

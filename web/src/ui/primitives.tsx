@@ -5,6 +5,7 @@
 //   3. Numbers      → font-mono tabular-nums
 //   4. Color        → grays for layout · green ONLY for primary CTA · status colors for status
 
+import { useEffect } from "react";
 import type { ReactNode, ButtonHTMLAttributes } from "react";
 import type { OrderStatus } from "../lib/types";
 
@@ -135,10 +136,72 @@ export function ScreenHeader({
 }
 
 // ─── StickyActionBar ──────────────────────────────────────────────────────────
+// Mobile: full-width bar pinned to the bottom. Desktop: matches the wider card
+// and floats the action to the right at a natural width instead of one giant
+// full-bleed button. (Buttons opt in with `md:w-auto` — see the screens.)
 export function StickyActionBar({ children }: { children: ReactNode }) {
   return (
     <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/85 backdrop-blur">
-      <div className="mx-auto max-w-md px-4 py-3">{children}</div>
+      <div className="mx-auto max-w-md px-4 py-3 md:flex md:max-w-2xl md:justify-end md:px-6">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─── Modal ────────────────────────────────────────────────────────────────────
+// A deliberately COMPACT confirmation popup — short, no scrolling. Same white +
+// green identity as the rest of the app. Click the backdrop or Esc to dismiss.
+export function Modal({
+  open,
+  onClose,
+  title,
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  children: ReactNode;
+}) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/40 p-4 backdrop-blur-sm sm:items-center"
+      style={{ animation: "el-modal-fade 160ms ease-out" }}
+      onClick={onClose}
+    >
+      <style>{`
+        @keyframes el-modal-fade { from { opacity: 0 } to { opacity: 1 } }
+        @keyframes el-modal-rise { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+      `}</style>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        onClick={(e) => e.stopPropagation()}
+        style={{ animation: "el-modal-rise 200ms cubic-bezier(0.16,1,0.3,1)" }}
+        className="w-full max-w-sm rounded-2xl border border-border/60 bg-background p-5 shadow-[0_24px_70px_-28px_rgba(16,24,40,0.45)]"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <h2 className="font-heading text-lg tracking-tight">{title}</h2>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="-mr-1 -mt-1 rounded-md p-1 text-muted-foreground transition-colors hover:bg-foreground/[0.05] hover:text-foreground"
+          >
+            ✕
+          </button>
+        </div>
+        {children}
+      </div>
     </div>
   );
 }

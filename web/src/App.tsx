@@ -333,6 +333,13 @@ export default function App() {
       </div>
     );
   }
+  if (preview === "offline") {
+    return (
+      <div className="min-h-svh bg-background text-foreground">
+        <EmergencyPreview />
+      </div>
+    );
+  }
   if (preview === "buyer") {
     return (
       <div className="min-h-svh bg-background text-foreground">
@@ -410,7 +417,7 @@ export default function App() {
     <div className="min-h-svh bg-background text-foreground md:bg-gradient-to-b md:from-[hsl(152,32%,97%)] md:to-[hsl(220,18%,94%)]">
       <div
         className={`md:mx-auto md:my-8 md:overflow-hidden md:rounded-2xl md:border md:border-border/60 md:bg-background md:shadow-[0_24px_70px_-28px_rgba(16,24,40,0.28)] ${
-          wideRoute ? "md:max-w-5xl" : "md:max-w-md"
+          wideRoute ? "md:max-w-5xl" : "md:max-w-2xl"
         }`}
       >
         {/* Global app header: brand + network, with a contextual Back on inner screens. */}
