@@ -14,11 +14,13 @@ export const STELLAR_EXPLORER_TX = (hash: string) =>
 export const SOROBAN_RPC_URL = "https://soroban-testnet.stellar.org";
 
 // The deployed EskoLokt deposit-escrow contract (Testnet). Overridable via env;
-// the fallback is the deposit-model contract deployed via CI on 2026-07-13.
-// (Pre-upgrade full-escrow contract was CBHTZBTBBLKR56GO2EICGJTMJE6FUFIXTBMSG4GIMB3NVVXZUBDUPGEN.)
+// the fallback is the deposit-model contract with the ON-CHAIN delivery-code hash,
+// deployed 2026-07-15. Teammates must set the same VITE_CONTRACT_ID in their env.
+// (Prior deposit contract w/o on-chain code check: CDRJK2QLAOGLIOSERJJ7GMXHVZPN7PVIY5VELKTNVS5DE7TKQDR5K7IT.
+//  Pre-upgrade full-escrow contract: CBHTZBTBBLKR56GO2EICGJTMJE6FUFIXTBMSG4GIMB3NVVXZUBDUPGEN.)
 export const CONTRACT_ID =
   (import.meta.env.VITE_CONTRACT_ID as string) ||
-  "CDRJK2QLAOGLIOSERJJ7GMXHVZPN7PVIY5VELKTNVS5DE7TKQDR5K7IT";
+  "CAVJDHDQZTVACI25P2HNDPTGOE6BGRKEHFN6ZA3WWSBDF7TT6CYDCVKA";
 
 // Test USDC used for the refundable deposit. The issuer is filled in after the
 // one-time asset setup (env); the token's SAC address is derived at runtime.

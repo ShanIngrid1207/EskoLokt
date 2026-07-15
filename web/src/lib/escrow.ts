@@ -12,8 +12,9 @@ import {
   Asset,
   nativeToScVal,
   scValToNative,
-  type xdr,
+  xdr,
 } from "@stellar/stellar-sdk";
+import { Buffer } from "buffer";
 import { SOROBAN_RPC_URL, CONTRACT_ID } from "./constants";
 
 export const server = new rpc.Server(SOROBAN_RPC_URL);
@@ -31,6 +32,15 @@ export function xlmToStroops(v: string): bigint {
   const fracPadded = (frac + "0000000").slice(0, 7);
   return BigInt(whole || "0") * STROOPS_PER_XLM + BigInt(fracPadded || "0");
 }
+
+// A 32-byte hash (from hex) as an ScVal — the contract's BytesN<32> code_hash.
+// The hex itself is produced by hashCode() in ./crypto (sha256 → hex), the same
+// value already stored in Supabase, so the app and the chain agree on the commitment.
+const bytesN32 = (hex: string): xdr.ScVal =>
+  xdr.ScVal.scvBytes(Buffer.from(hex.match(/.{2}/g)!.map((h) => parseInt(h, 16))));
+// The raw delivery code bytes as an ScVal — the contract hashes these to compare.
+const bytesUtf8 = (text: string): xdr.ScVal =>
+  xdr.ScVal.scvBytes(Buffer.from(new TextEncoder().encode(text)));
 
 export type Signer = (xdr: string) => Promise<string>;
 
@@ -90,6 +100,7 @@ export async function createOrder(p: {
   seller: string;
   amountXlm: string;
   deadlineUnix: number;
+  codeHashHex: string;
   sign: Signer;
 }): Promise<{ orderId: string; hash: string }> {
   const op = new Contract(CONTRACT_ID).call(
@@ -99,6 +110,7 @@ export async function createOrder(p: {
     addr(DEPOSIT_SAC),
     i128(xlmToStroops(p.amountXlm)),
     u64(BigInt(p.deadlineUnix)),
+    bytesN32(p.codeHashHex),
   );
   const { hash, returnValue } = await invoke(p.buyer, op, p.sign);
   const orderId = returnValue ? String(scValToNative(returnValue)) : "";
@@ -109,9 +121,14 @@ export async function createOrder(p: {
 export async function confirmDelivery(p: {
   publicKey: string;
   orderId: string;
+  code: string;
   sign: Signer;
 }): Promise<{ hash: string }> {
-  const op = new Contract(CONTRACT_ID).call("confirm_delivery", u64(BigInt(p.orderId)));
+  const op = new Contract(CONTRACT_ID).call(
+    "confirm_delivery",
+    u64(BigInt(p.orderId)),
+    bytesUtf8(p.code),
+  );
   const { hash } = await invoke(p.publicKey, op, p.sign);
   return { hash };
 }

@@ -130,12 +130,18 @@ export default function App() {
     const buyer = wallet.getAddress();
     if (!buyer) throw new Error("Connect a wallet first.");
     if (!order) throw new Error("Order not loaded.");
+    // The seller's delivery-code hash is committed on-chain at deposit time, so the
+    // code becomes enforceable by the contract (not just the database).
+    const row = await getOrderByRef(order.ref);
+    const codeHashHex = row?.delivery_code_hash;
+    if (!codeHashHex) throw new Error("Order is missing its delivery-code commitment.");
     const deadlineUnix = Math.floor(new Date(order.deadline).getTime() / 1000);
     const { orderId, hash } = await createOrder({
       buyer,
       seller: order.sellerAddress,
       amountXlm: order.deposit,
       deadlineUnix,
+      codeHashHex,
       sign: wallet.signTransaction,
     });
     await attachBuyer(order.ref, buyer, Number(orderId));
@@ -156,10 +162,18 @@ export default function App() {
     if (!order) throw new Error("Order not loaded.");
     const pub = wallet.getAddress();
     if (!pub) throw new Error("Connect a wallet first.");
-    const ok = await verifyDeliveryCode(order.ref, code);
+    const normalized = code.trim().toUpperCase();
+    const ok = await verifyDeliveryCode(order.ref, normalized);
     if (!ok) throw new Error("That delivery code doesn't match.");
     const orderId = await onChainOrderId(order.ref);
-    const { hash } = await confirmDelivery({ publicKey: pub, orderId, sign: wallet.signTransaction });
+    // Pass the code itself — the contract hashes it and checks against the on-chain
+    // commitment, so a wrong code is rejected by the chain, not just the database.
+    const { hash } = await confirmDelivery({
+      publicKey: pub,
+      orderId,
+      code: normalized,
+      sign: wallet.signTransaction,
+    });
     await updateStatus(order.ref, "delivered");
     await refreshOrder(order.ref);
     return { hash };
