@@ -31,8 +31,9 @@ import { HomeScreen } from "./screens/HomeScreen";
 import { SellerCreateScreen } from "./screens/SellerCreateScreen";
 import { BuyerOrderScreen } from "./screens/BuyerOrderScreen";
 import { OrderDetailScreen } from "./screens/OrderDetailScreen";
+import { PracticeScreen } from "./screens/PracticeScreen";
 
-type Route = "connect" | "home" | "sell" | "buyOrder" | "detail";
+type Route = "connect" | "home" | "sell" | "buyOrder" | "detail" | "practice";
 
 export default function App() {
   const [address, setAddress] = useState<string | null>(() => wallet.getAddress());
@@ -260,8 +261,11 @@ export default function App() {
           orders={myOrders}
           onSell={() => setRoute("sell")}
           onOpenOrder={openOrder}
+          onPractice={() => setRoute("practice")}
         />
       )}
+
+      {route === "practice" && <PracticeScreen onBack={() => setRoute("home")} />}
 
       {route === "sell" && <SellerCreateScreen onCreate={handleCreate} />}
 

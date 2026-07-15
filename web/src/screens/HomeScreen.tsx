@@ -10,11 +10,13 @@ export function HomeScreen({
   orders,
   onSell,
   onOpenOrder,
+  onPractice,
 }: {
   address: string;
   orders: OrderView[];
   onSell: () => void;
   onOpenOrder: (ref: string) => void;
+  onPractice: () => void;
 }) {
   const [buyLinkInput, setBuyLinkInput] = useState("");
   const [showBuyInput, setShowBuyInput] = useState(false);
@@ -65,6 +67,16 @@ export function HomeScreen({
           </div>
         </button>
       </div>
+
+      {/* Practice / teaching demo */}
+      <button
+        id="home-practice-btn"
+        onClick={onPractice}
+        className="mt-3 w-full rounded-xl border border-dashed border-border/70 bg-background/40 px-4 py-3 text-left text-sm text-muted-foreground transition-all hover:border-border hover:text-foreground active:scale-[0.99]"
+      >
+        <span className="font-medium text-foreground">New here?</span> Try the practice demo — no
+        wallet, nothing real is spent.
+      </button>
 
       {/* Buy link input (shown when Buy card is clicked) */}
       {showBuyInput && (
