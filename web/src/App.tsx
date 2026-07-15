@@ -285,6 +285,18 @@ export default function App() {
       </div>
     );
   }
+  if (preview === "buyer") {
+    return (
+      <div className="min-h-svh bg-background text-foreground">
+        <BuyerOrderScreen
+          order={{ ...PREVIEW_ORDERS[0], status: "awaiting_deposit", sellerAddress: "GA5YSD7QF2K3M9WZ8HJ4NPQR6YJU" }}
+          connected={false}
+          onConnect={async () => {}}
+          onLockDeposit={async () => ({ hash: "abc" })}
+        />
+      </div>
+    );
+  }
 
   // Connect route is a full-viewport split-card design (no framed shell).
   if (route === "connect") {
