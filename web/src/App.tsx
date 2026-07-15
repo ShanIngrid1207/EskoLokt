@@ -34,6 +34,7 @@ import { BuyerOrderScreen } from "./screens/BuyerOrderScreen";
 import { OrderDetailScreen } from "./screens/OrderDetailScreen";
 import { PracticeScreen } from "./screens/PracticeScreen";
 import { GuideScreen } from "./screens/GuideScreen";
+import { SellerDashboard } from "./screens/SellerDashboard";
 
 type Route = "connect" | "home" | "sell" | "buyOrder" | "detail" | "practice" | "guide";
 
@@ -41,6 +42,15 @@ type Route = "connect" | "home" | "sell" | "buyOrder" | "detail" | "practice" | 
 const SEEN_GUIDE_KEY = "eskolokt.seenGuide";
 const hasSeenGuide = () =>
   typeof window !== "undefined" && window.localStorage.getItem(SEEN_GUIDE_KEY) === "1";
+
+// Sample orders for the /?preview=dashboard design preview only.
+const PREVIEW_ORDERS: OrderView[] = [
+  { ref: "EL-7QF2", itemName: "Blue cotton tee", deposit: "0.50", sellerAddress: "", buyerAddress: null, deadline: new Date(Date.now() + 6 * 3600e3).toISOString(), createdIso: new Date(Date.now() - 2 * 3600e3).toISOString(), status: "funded" },
+  { ref: "EL-3KM9", itemName: "Handmade earrings", deposit: "0.30", sellerAddress: "", buyerAddress: null, deadline: new Date(Date.now() - 2 * 3600e3).toISOString(), createdIso: new Date(Date.now() - 26 * 3600e3).toISOString(), status: "awaiting_deposit" },
+  { ref: "EL-P8ZT", itemName: "Phone case (clear)", deposit: "0.20", sellerAddress: "", buyerAddress: null, deadline: new Date(Date.now() + 20 * 3600e3).toISOString(), createdIso: new Date(Date.now() - 50 * 3600e3).toISOString(), status: "shipped" },
+  { ref: "EL-M4RW", itemName: "Scented candle set", deposit: "0.75", sellerAddress: "", buyerAddress: null, deadline: new Date(Date.now() - 40 * 3600e3).toISOString(), createdIso: new Date(Date.now() - 4 * 86400e3).toISOString(), status: "delivered" },
+  { ref: "EL-V2BX", itemName: "Tote bag", deposit: "0.40", sellerAddress: "", buyerAddress: null, deadline: new Date(Date.now() - 60 * 3600e3).toISOString(), createdIso: new Date(Date.now() - 6 * 86400e3).toISOString(), status: "no_show" },
+];
 
 export default function App() {
   const [address, setAddress] = useState<string | null>(() => wallet.getAddress());
@@ -243,9 +253,60 @@ export default function App() {
   }
 
   const showBack = route === "sell" || route === "detail";
-  // The home screen gets a wide, dashboard-style surface on desktop; focused
-  // screens (forms, order detail) stay a comfortable reading width.
-  const wideRoute = route === "home";
+  const wideRoute = false;
+
+  // TEMP preview: /?preview=dashboard renders the dashboard with sample data.
+  const previewDash =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("preview") === "dashboard";
+  if (previewDash) {
+    return (
+      <SellerDashboard
+        address="GA5YSD7QF2K3M9WZ8HJ4NPQR6YJU"
+        orders={PREVIEW_ORDERS}
+        onNewOrder={() => {}}
+        onOpenOrder={() => {}}
+        onGuide={() => {}}
+      />
+    );
+  }
+
+  // Home route: desktop shows the seller dashboard; mobile keeps the simple flow.
+  if (route === "home") {
+    return (
+      <>
+        <div className="hidden md:block">
+          <SellerDashboard
+            address={address ?? ""}
+            orders={myOrders}
+            onNewOrder={() => setRoute("sell")}
+            onOpenOrder={openOrder}
+            onGuide={() => setRoute("guide")}
+          />
+        </div>
+        <div className="min-h-svh bg-background text-foreground md:hidden">
+          <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border/60 bg-background/85 px-4 py-2.5 backdrop-blur">
+            <span className="font-heading text-sm tracking-tight">EskoLokt</span>
+            <span className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-border/70 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              <span className="size-1.5 rounded-full bg-primary" /> Test mode
+            </span>
+          </header>
+          {loadError && (
+            <div className="mx-auto max-w-md px-4 pt-4">
+              <p className="rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600">{loadError}</p>
+            </div>
+          )}
+          <HomeScreen
+            address={address ?? ""}
+            orders={myOrders}
+            onSell={() => setRoute("sell")}
+            onOpenOrder={openOrder}
+            onGuide={() => setRoute("guide")}
+          />
+        </div>
+      </>
+    );
+  }
 
   return (
     // Mobile-first: on phones this is edge-to-edge (all desktop styling is md:*).
@@ -291,16 +352,6 @@ export default function App() {
           onConnect={handleConnect}
           onGetTestFunds={handleGetTestFunds}
           onContinue={enterApp}
-        />
-      )}
-
-      {route === "home" && (
-        <HomeScreen
-          address={address ?? ""}
-          orders={myOrders}
-          onSell={() => setRoute("sell")}
-          onOpenOrder={openOrder}
-          onGuide={() => setRoute("guide")}
         />
       )}
 

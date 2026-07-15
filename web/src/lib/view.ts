@@ -9,6 +9,7 @@ export function rowToView(row: OrderRow): OrderView {
     sellerAddress: row.seller_address,
     buyerAddress: row.buyer_address,
     deadline: row.deadline,
+    createdIso: row.created_at,
     status: row.status,
     txHashes: [],
   };

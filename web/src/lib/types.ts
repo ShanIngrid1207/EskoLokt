@@ -32,6 +32,7 @@ export type OrderView = {
   sellerAddress: string;
   buyerAddress: string | null;
   deadline: string; // ISO
+  createdIso: string; // ISO — when the order was created
   status: OrderStatus;
   txHashes?: { label: string; hash: string }[];
 };
