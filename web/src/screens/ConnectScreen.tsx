@@ -16,7 +16,7 @@ export function ConnectScreen({
   address: string;
   onConnect: () => Promise<void>;
   onGetTestFunds: () => Promise<void>;
-  onAddTrustline: () => Promise<void>;
+  onAddTrustline?: () => Promise<void>;
   onContinue?: () => void;
 }) {
   const [connectBusy, setConnectBusy] = useState(false);
@@ -50,6 +50,7 @@ export function ConnectScreen({
   };
 
   const handleAddTrustline = async () => {
+    if (!onAddTrustline) return;
     setTrustBusy(true);
     setTrustMsg(null);
     try {
@@ -118,24 +119,26 @@ export function ConnectScreen({
               </p>
             )}
 
-            <Button
-              id="add-trustline-btn"
-              variant="outline"
-              onClick={handleAddTrustline}
-              disabled={trustBusy}
-            >
-              {trustBusy ? "Adding…" : "Add USDC trustline"}
-            </Button>
-            {trustMsg && (
-              <p
-                className={`text-center text-xs ${
-                  trustMsg.includes("✓")
-                    ? "text-emerald-600"
-                    : "text-rose-600"
-                }`}
-              >
-                {trustMsg}
-              </p>
+            {onAddTrustline && (
+              <>
+                <Button
+                  id="add-trustline-btn"
+                  variant="outline"
+                  onClick={handleAddTrustline}
+                  disabled={trustBusy}
+                >
+                  {trustBusy ? "Adding…" : "Add USDC trustline"}
+                </Button>
+                {trustMsg && (
+                  <p
+                    className={`text-center text-xs ${
+                      trustMsg.includes("✓") ? "text-emerald-600" : "text-rose-600"
+                    }`}
+                  >
+                    {trustMsg}
+                  </p>
+                )}
+              </>
             )}
           </div>
 

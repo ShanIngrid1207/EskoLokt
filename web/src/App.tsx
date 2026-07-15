@@ -7,10 +7,9 @@
 // deposit on-chain. On delivery the buyer confirms with the code (deposit
 // returns to them); on a no-show past the deadline the seller claims it.
 //
-// NOTE: the on-chain steps (lock / confirm / claim) execute once the test USDC
-// asset is configured (VITE_USDC_ISSUER). Until then they surface a clear error;
-// everything else — navigation, order creation/sharing, status, wallet, funds —
-// works today.
+// The deposit is native XLM (Testnet), so the full loop — lock / confirm / claim —
+// works out of the box: fund a wallet from friendbot and go. (USDC is a one-line
+// swap in escrow.ts for later.)
 import { useEffect, useState } from "react";
 import { wallet } from "./lib/wallet";
 import { createOrder, confirmDelivery, claimExpired } from "./lib/escrow";
@@ -25,7 +24,7 @@ import {
 } from "./lib/orders";
 import { hashCode } from "./lib/crypto";
 import { rowToView, genRef, genDeliveryCode } from "./lib/view";
-import { FRIENDBOT_URL, USDC_ISSUER } from "./lib/constants";
+import { FRIENDBOT_URL } from "./lib/constants";
 import type { OrderView } from "./lib/types";
 import { ConnectScreen } from "./screens/ConnectScreen";
 import { HomeScreen } from "./screens/HomeScreen";
@@ -101,15 +100,6 @@ export default function App() {
     if (!res.ok) throw new Error("Friendbot: account may already be funded — check your balance.");
   }
 
-  async function handleAddTrustline() {
-    if (!USDC_ISSUER) {
-      throw new Error("Test USDC isn't set up yet — it arrives with the token deploy.");
-    }
-    // TODO(O1): once USDC_ISSUER is configured, build a classic changeTrust op
-    // for USDC:<issuer>, sign via wallet.signTransaction, submit to Horizon.
-    throw new Error("USDC trustline flow pending token setup.");
-  }
-
   // ── Seller ────────────────────────────────────────────────────────────────────
   async function handleCreate(input: {
     itemName: string;
@@ -144,7 +134,7 @@ export default function App() {
     const { orderId, hash } = await createOrder({
       buyer,
       seller: order.sellerAddress,
-      amountUsdc: order.deposit,
+      amountXlm: order.deposit,
       deadlineUnix,
       sign: wallet.signTransaction,
     });
@@ -246,7 +236,6 @@ export default function App() {
           address={address ?? ""}
           onConnect={handleConnect}
           onGetTestFunds={handleGetTestFunds}
-          onAddTrustline={handleAddTrustline}
           onContinue={() => setRoute("home")}
         />
       )}

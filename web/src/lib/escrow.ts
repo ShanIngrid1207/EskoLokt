@@ -14,25 +14,22 @@ import {
   scValToNative,
   type xdr,
 } from "@stellar/stellar-sdk";
-import { SOROBAN_RPC_URL, CONTRACT_ID, USDC_CODE, USDC_ISSUER } from "./constants";
+import { SOROBAN_RPC_URL, CONTRACT_ID } from "./constants";
 
 export const server = new rpc.Server(SOROBAN_RPC_URL);
 
-const UNITS_PER_USDC = 10_000_000n; // Stellar assets use 7 decimals
+const STROOPS_PER_XLM = 10_000_000n; // 1 XLM = 10,000,000 stroops (7 decimals)
 
-/**
- * USDC's Stellar Asset Contract address, computed at runtime. Lazy so an unset
- * issuer only errors when actually used (not at module load / in the UI harness).
- */
-export function usdcSac(): string {
-  return new Asset(USDC_CODE, USDC_ISSUER).contractId(Networks.TESTNET);
-}
+// Native XLM's Stellar Asset Contract address on Testnet — the deposit asset.
+// Native needs no issuer/trustline/faucet, so the whole loop works out of the box.
+// (Swapping to a USDC SAC later is a one-line change here.)
+export const DEPOSIT_SAC = Asset.native().contractId(Networks.TESTNET);
 
-/** Convert a USDC string (up to 7 decimal places) to i128 base units. */
-export function usdcToUnits(v: string): bigint {
+/** Convert an XLM string (up to 7 decimal places) to i128 stroops. */
+export function xlmToStroops(v: string): bigint {
   const [whole, frac = ""] = v.trim().split(".");
   const fracPadded = (frac + "0000000").slice(0, 7);
-  return BigInt(whole || "0") * UNITS_PER_USDC + BigInt(fracPadded || "0");
+  return BigInt(whole || "0") * STROOPS_PER_XLM + BigInt(fracPadded || "0");
 }
 
 export type Signer = (xdr: string) => Promise<string>;
@@ -91,7 +88,7 @@ async function invoke(
 export async function createOrder(p: {
   buyer: string;
   seller: string;
-  amountUsdc: string;
+  amountXlm: string;
   deadlineUnix: number;
   sign: Signer;
 }): Promise<{ orderId: string; hash: string }> {
@@ -99,8 +96,8 @@ export async function createOrder(p: {
     "create_order",
     addr(p.buyer),
     addr(p.seller),
-    addr(usdcSac()),
-    i128(usdcToUnits(p.amountUsdc)),
+    addr(DEPOSIT_SAC),
+    i128(xlmToStroops(p.amountXlm)),
     u64(BigInt(p.deadlineUnix)),
   );
   const { hash, returnValue } = await invoke(p.buyer, op, p.sign);

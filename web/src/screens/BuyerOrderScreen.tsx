@@ -76,7 +76,7 @@ export function BuyerOrderScreen({
 
       {/* Stat tiles row */}
       <div className="mt-6 grid grid-cols-2 gap-3">
-        <StatTile label="Deposit" value={`${order.deposit} USDC`} />
+        <StatTile label="Deposit" value={`${order.deposit} XLM`} />
         <StatTile label="Item" value={order.itemName} />
       </div>
 

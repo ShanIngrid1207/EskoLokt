@@ -136,7 +136,7 @@ export function SellerCreateScreen({
           />
         </Labelled>
 
-        <Labelled label="Deposit (USDC)">
+        <Labelled label="Deposit (XLM)">
           <input
             id="seller-deposit"
             value={deposit}
