@@ -271,6 +271,19 @@ export default function App() {
     );
   }
 
+  // Connect route is a full-viewport split-card design (no framed shell).
+  if (route === "connect") {
+    return (
+      <ConnectScreen
+        connected={!!address}
+        address={address ?? ""}
+        onConnect={handleConnect}
+        onGetTestFunds={handleGetTestFunds}
+        onContinue={enterApp}
+      />
+    );
+  }
+
   // Home route: desktop shows the seller dashboard; mobile keeps the simple flow.
   if (route === "home") {
     return (
@@ -344,16 +357,6 @@ export default function App() {
             <p className="rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600">{loadError}</p>
           </div>
         )}
-
-      {route === "connect" && (
-        <ConnectScreen
-          connected={!!address}
-          address={address ?? ""}
-          onConnect={handleConnect}
-          onGetTestFunds={handleGetTestFunds}
-          onContinue={enterApp}
-        />
-      )}
 
       {route === "guide" && (
         <GuideScreen
