@@ -44,6 +44,7 @@ export function HomeScreen({
         {/* Sell card */}
         <button
           id="home-sell-btn"
+          data-tour="create"
           onClick={onSell}
           className="group rounded-xl border border-border/60 bg-background/40 p-4 text-left transition-all hover:border-primary/40 hover:bg-primary/[0.03] active:scale-[0.98]"
         >
@@ -59,6 +60,7 @@ export function HomeScreen({
         {/* Buy card */}
         <button
           id="home-buy-btn"
+          data-tour="buy"
           onClick={() => setShowBuyInput((v) => !v)}
           className="group rounded-xl border border-border/60 bg-background/40 p-4 text-left transition-all hover:border-border active:scale-[0.98]"
         >
@@ -75,6 +77,7 @@ export function HomeScreen({
       {/* How it works — step-by-step guide */}
       <button
         id="home-guide-btn"
+        data-tour="howitworks"
         onClick={onGuide}
         className="mt-3 w-full rounded-xl border border-dashed border-border/70 bg-background/40 px-4 py-3 text-left text-sm text-muted-foreground transition-all hover:border-border hover:text-foreground active:scale-[0.99]"
       >
@@ -112,7 +115,7 @@ export function HomeScreen({
 
         </div>
         {/* Right column: My orders */}
-        <div className="mt-8 md:mt-0">
+        <div className="mt-8 md:mt-0" data-tour="orders">
         <MicroLabel>My orders</MicroLabel>
 
         {orders.length === 0 ? (

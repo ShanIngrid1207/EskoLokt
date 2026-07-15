@@ -36,10 +36,10 @@ import { SellerCreateScreen } from "./screens/SellerCreateScreen";
 import { BuyerOrderScreen } from "./screens/BuyerOrderScreen";
 import { OrderDetailScreen } from "./screens/OrderDetailScreen";
 import { PracticeScreen } from "./screens/PracticeScreen";
-import { GuideScreen } from "./screens/GuideScreen";
+import { TourOverlay } from "./screens/TourOverlay";
 import { SellerDashboard } from "./screens/SellerDashboard";
 
-type Route = "connect" | "home" | "sell" | "buyOrder" | "detail" | "practice" | "guide" | "offline";
+type Route = "connect" | "home" | "sell" | "buyOrder" | "detail" | "practice" | "offline";
 
 // Show the step-by-step guide the first time a seller signs in.
 const SEEN_GUIDE_KEY = "eskolokt.seenGuide";
@@ -63,6 +63,16 @@ export default function App() {
   const [myOrders, setMyOrders] = useState<OrderView[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [online, setOnline] = useState(() => (typeof navigator !== "undefined" ? navigator.onLine : true));
+  // Spotlight tour: auto-shown once for new sellers, replayable from "How it works".
+  // ?tour=1 force-opens it (handy for demos / verification).
+  const forceTour =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("tour") === "1";
+  const [tourOpen, setTourOpen] = useState(forceTour);
+  const finishTour = () => {
+    setTourOpen(false);
+    if (typeof window !== "undefined") window.localStorage.setItem(SEEN_GUIDE_KEY, "1");
+  };
 
   // Offline awareness: the app (a PWA) keeps working; tell the user what still works.
   useEffect(() => {
@@ -125,9 +135,10 @@ export default function App() {
     if (row) setOrder(rowToView(row));
   }
 
-  // After signing in, first-timers see the how-it-works guide, then home.
+  // After signing in, land on home; first-timers get the spotlight tour on top.
   function enterApp() {
-    setRoute(hasSeenGuide() ? "home" : "guide");
+    setRoute("home");
+    if (!hasSeenGuide()) setTourOpen(true);
   }
 
   // ── Wallet ──────────────────────────────────────────────────────────────────
@@ -136,7 +147,8 @@ export default function App() {
     setAddress(a);
     await loadMyOrders(a);
     toast.success("Wallet connected");
-    setRoute((r) => (r === "connect" ? (hasSeenGuide() ? "home" : "guide") : r));
+    setRoute((r) => (r === "connect" ? "home" : r));
+    if (!hasSeenGuide()) setTourOpen(true);
   }
 
   async function handleGetTestFunds() {
@@ -309,21 +321,17 @@ export default function App() {
     typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("preview") : null;
   if (preview === "dashboard") {
     return (
-      <SellerDashboard
-        address="GA5YSD7QF2K3M9WZ8HJ4NPQR6YJU"
-        orders={PREVIEW_ORDERS}
-        onNewOrder={() => {}}
-        onOpenOrder={() => {}}
-        onGuide={() => {}}
-        onOffline={() => {}}
-      />
-    );
-  }
-  if (preview === "guide") {
-    return (
-      <div className="min-h-svh bg-background text-foreground">
-        <GuideScreen onDone={() => {}} onPractice={() => {}} />
-      </div>
+      <>
+        <TourOverlay open={tourOpen} onClose={() => setTourOpen(false)} />
+        <SellerDashboard
+          address="GA5YSD7QF2K3M9WZ8HJ4NPQR6YJU"
+          orders={PREVIEW_ORDERS}
+          onNewOrder={() => {}}
+          onOpenOrder={() => {}}
+          onGuide={() => setTourOpen(true)}
+          onOffline={() => {}}
+        />
+      </>
     );
   }
   if (preview === "create") {
@@ -372,13 +380,14 @@ export default function App() {
   if (route === "home") {
     return (
       <>
+        <TourOverlay open={tourOpen} onClose={finishTour} />
         <div className="hidden md:block">
           <SellerDashboard
             address={address ?? ""}
             orders={myOrders}
             onNewOrder={() => setRoute("sell")}
             onOpenOrder={openOrder}
-            onGuide={() => setRoute("guide")}
+            onGuide={() => setTourOpen(true)}
             onOffline={() => setRoute("offline")}
           />
         </div>
@@ -405,7 +414,7 @@ export default function App() {
             orders={myOrders}
             onSell={() => setRoute("sell")}
             onOpenOrder={openOrder}
-            onGuide={() => setRoute("guide")}
+            onGuide={() => setTourOpen(true)}
           />
         </div>
       </>
@@ -448,16 +457,6 @@ export default function App() {
             <p className="rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600">{loadError}</p>
           </div>
         )}
-
-      {route === "guide" && (
-        <GuideScreen
-          onDone={() => {
-            if (typeof window !== "undefined") window.localStorage.setItem(SEEN_GUIDE_KEY, "1");
-            setRoute("home");
-          }}
-          onPractice={() => setRoute("practice")}
-        />
-      )}
 
       {route === "practice" && <PracticeScreen onBack={() => setRoute("home")} />}
 

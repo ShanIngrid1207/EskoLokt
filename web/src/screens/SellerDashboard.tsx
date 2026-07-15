@@ -97,6 +97,7 @@ export function SellerDashboard({
         </span>
         <div className="ml-auto flex items-center gap-3">
           <button
+            data-tour="create"
             onClick={onNewOrder}
             className="inline-flex h-9 items-center gap-1.5 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
           >
@@ -115,7 +116,7 @@ export function SellerDashboard({
           <nav className="flex flex-col gap-0.5 px-2">
             <SideItem active icon={<HomeIcon />} label="Dashboard" />
             <SideItem icon={<InboxIcon />} label="New order" onClick={onNewOrder} />
-            <SideItem icon={<InfoIcon />} label="How it works" onClick={onGuide} />
+            <SideItem icon={<InfoIcon />} label="How it works" onClick={onGuide} tour="howitworks" />
             <SideItem icon={<PhoneIcon />} label="Pay by text (offline)" onClick={onOffline} />
           </nav>
 
@@ -227,7 +228,7 @@ export function SellerDashboard({
           </div>
 
           {/* Orders table */}
-          <div className="mt-6">
+          <div className="mt-6" data-tour="orders">
             <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
               {filter === "all" ? "All orders" : filter === "active" ? "Active orders" : "Finished orders"}
             </div>
@@ -382,16 +383,19 @@ function SideItem({
   count,
   active,
   onClick,
+  tour,
 }: {
   icon: React.ReactNode;
   label: string;
   count?: number;
   active?: boolean;
   onClick?: () => void;
+  tour?: string;
 }) {
   return (
     <button
       type="button"
+      data-tour={tour}
       onClick={onClick}
       className={`flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-sm transition-colors ${
         active ? "bg-foreground/[0.06] text-foreground" : "text-muted-foreground hover:bg-foreground/[0.04]"
