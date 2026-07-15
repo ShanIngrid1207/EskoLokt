@@ -25,7 +25,7 @@ export function SellerCreateScreen({
 }) {
   const [itemName, setItemName] = useState("");
   const [deposit, setDeposit] = useState("0.50");
-  const [minutes, setMinutes] = useState(10);
+  const [minutes, setMinutes] = useState(1440);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<Created | null>(null);
