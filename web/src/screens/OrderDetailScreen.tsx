@@ -8,11 +8,10 @@ import {
   Button,
   Card,
   MicroLabel,
-  ScreenHeader,
-  StickyActionBar,
   StatusPill,
 } from "../ui/primitives";
 import { TxStatus, type TxState } from "../ui/TxStatus";
+import { getDeliveryCode } from "../lib/codeStore";
 
 // ─── Timeline definition ─────────────────────────────────────────────────────
 type TimelineStep = {
@@ -62,9 +61,23 @@ export function OrderDetailScreen({
   const [txState, setTxState] = useState<TxState>({ kind: "idle" });
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
 
   const deadlinePassed = new Date(order.deadline) < new Date();
   const shareUrl = `${window.location.origin}${window.location.pathname}?order=${order.ref}`;
+  const savedCode = getDeliveryCode(order.ref);
+  const orderOpen = order.status !== "delivered" && order.status !== "no_show";
+
+  const copyCode = async () => {
+    if (!savedCode) return;
+    try {
+      await navigator.clipboard.writeText(savedCode);
+      setCodeCopied(true);
+      setTimeout(() => setCodeCopied(false), 1500);
+    } catch {
+      /* clipboard unavailable */
+    }
+  };
 
   const copyLink = async () => {
     try {
@@ -144,7 +157,7 @@ export function OrderDetailScreen({
 
   // ─── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="mx-auto max-w-md px-4 py-8 pb-28">
+    <div className="mx-auto max-w-md px-4 py-8 md:max-w-2xl">
       {/* Header */}
       <div className="flex items-start justify-between gap-2 border-b border-border/60 pb-5">
         <div>
@@ -156,8 +169,33 @@ export function OrderDetailScreen({
         </div>
       </div>
 
+      {/* Seller: the delivery code again, to write on the parcel / re-share */}
+      {role === "seller" && orderOpen && (
+        <Card className="mt-6">
+          <MicroLabel>Delivery code (write on the parcel)</MicroLabel>
+          {savedCode ? (
+            <>
+              <div className="mt-1 font-mono text-3xl tracking-[0.3em] tabular-nums">{savedCode}</div>
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                <Button variant="outline" onClick={copyCode}>
+                  {codeCopied ? "Code copied ✓" : "Copy code"}
+                </Button>
+                <Button variant="outline" onClick={copyLink}>
+                  {copied ? "Link copied ✓" : "Copy link to send again"}
+                </Button>
+              </div>
+            </>
+          ) : (
+            <p className="mt-1 text-sm text-muted-foreground">
+              This code was created on a different device or browser, so it isn't saved here. Your
+              buyer still has it in their order link, and it's written on the parcel.
+            </p>
+          )}
+        </Card>
+      )}
+
       {/* Status timeline */}
-      <Card className="mt-6">
+      <Card className="mt-3">
         <MicroLabel>Status timeline</MicroLabel>
         <ol className="mt-3 space-y-0">
           {(order.status === "no_show"
@@ -230,8 +268,8 @@ export function OrderDetailScreen({
 
       <TxStatus state={txState} />
 
-      {/* ─── Role-based sticky actions ─────────────────────────────────────── */}
-      <StickyActionBar>
+      {/* ─── Role-based actions ───────────────────────────────────────────── */}
+      <div className="mt-4">
         {/* Buyer: confirm delivery when funded or shipped */}
         {role === "buyer" &&
           (order.status === "funded" || order.status === "shipped") && (
@@ -316,7 +354,7 @@ export function OrderDetailScreen({
               : "✗ Closed — you kept the deposit to cover your costs."}
           </div>
         )}
-      </StickyActionBar>
+      </div>
     </div>
   );
 }

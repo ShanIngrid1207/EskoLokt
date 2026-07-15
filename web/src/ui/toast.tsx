@@ -59,8 +59,8 @@ export function Toaster() {
   }, []);
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-[100] flex flex-col items-center gap-2 px-4">
-      <style>{`@keyframes toast-in{from{opacity:0;transform:translateY(12px) scale(0.98)}to{opacity:1;transform:none}}`}</style>
+    <div className="pointer-events-none fixed top-4 right-4 left-4 z-[100] flex flex-col items-end gap-2 sm:left-auto">
+      <style>{`@keyframes toast-in{from{opacity:0;transform:translateY(-12px) scale(0.98)}to{opacity:1;transform:none}}`}</style>
       {items.map((t) => (
         <ToastCard key={t.id} item={t} onClose={() => toast.dismiss(t.id)} />
       ))}

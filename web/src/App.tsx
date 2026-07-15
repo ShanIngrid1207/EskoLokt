@@ -24,6 +24,7 @@ import {
   subscribeToOrder,
 } from "./lib/orders";
 import { hashCode } from "./lib/crypto";
+import { saveDeliveryCode } from "./lib/codeStore";
 import { rowToView, genRef, genDeliveryCode } from "./lib/view";
 import { FRIENDBOT_URL } from "./lib/constants";
 import { EmergencyPreview } from "./screens/EmergencyPreview";
@@ -167,6 +168,7 @@ export default function App() {
       delivery_code_hash,
     });
     const shareUrl = `${window.location.origin}${window.location.pathname}?order=${ref}`;
+    saveDeliveryCode(ref, code); // so the seller can look it up again later
     await loadMyOrders(a);
     toast.success("Order created — now share the link with your buyer");
     return { ref, deliveryCode: code, shareUrl };
