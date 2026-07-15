@@ -225,25 +225,37 @@ export default function App() {
   const showBack = route === "sell" || route === "detail";
 
   return (
-    <div className="min-h-svh bg-background text-foreground">
-      {showBack && (
-        <div className="sticky top-0 z-20 border-b border-border/60 bg-background/85 backdrop-blur">
-          <div className="mx-auto flex max-w-md items-center px-4 py-2.5">
-            <button
-              onClick={goHome}
-              className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground"
-            >
-              ← Back
-            </button>
+    // Mobile-first: on phones this is edge-to-edge (all desktop styling is md:*).
+    // On desktop the app sits in a centered, framed surface on a branded backdrop
+    // so it reads as a real app instead of a lonely phone-width strip.
+    <div className="min-h-svh bg-background text-foreground md:bg-gradient-to-b md:from-[hsl(152,32%,97%)] md:to-[hsl(220,18%,94%)]">
+      <div className="md:mx-auto md:my-8 md:max-w-md md:overflow-hidden md:rounded-2xl md:border md:border-border/60 md:bg-background md:shadow-[0_24px_70px_-28px_rgba(16,24,40,0.28)]">
+        {/* Global app header: brand + network, with a contextual Back on inner screens. */}
+        <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur md:static">
+          <div className="mx-auto flex max-w-md items-center gap-3 px-4 py-2.5">
+            {showBack ? (
+              <button
+                onClick={goHome}
+                className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground hover:text-foreground"
+              >
+                ← Back
+              </button>
+            ) : (
+              <button onClick={goHome} className="font-heading text-sm tracking-tight">
+                EskoLokt
+              </button>
+            )}
+            <span className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-border/70 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              <span className="size-1.5 rounded-full bg-primary" /> Testnet
+            </span>
           </div>
-        </div>
-      )}
+        </header>
 
-      {loadError && (
-        <div className="mx-auto max-w-md px-4 pt-4">
-          <p className="rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600">{loadError}</p>
-        </div>
-      )}
+        {loadError && (
+          <div className="mx-auto max-w-md px-4 pt-4">
+            <p className="rounded-lg bg-rose-500/10 px-3 py-2 text-sm text-rose-600">{loadError}</p>
+          </div>
+        )}
 
       {route === "connect" && (
         <ConnectScreen
@@ -287,6 +299,7 @@ export default function App() {
           onClaim={handleClaim}
         />
       )}
+      </div>
     </div>
   );
 }
