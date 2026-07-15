@@ -255,11 +255,10 @@ export default function App() {
   const showBack = route === "sell" || route === "detail";
   const wideRoute = false;
 
-  // TEMP preview: /?preview=dashboard renders the dashboard with sample data.
-  const previewDash =
-    typeof window !== "undefined" &&
-    new URLSearchParams(window.location.search).get("preview") === "dashboard";
-  if (previewDash) {
+  // Design previews (no login): /?preview=dashboard | guide
+  const preview =
+    typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("preview") : null;
+  if (preview === "dashboard") {
     return (
       <SellerDashboard
         address="GA5YSD7QF2K3M9WZ8HJ4NPQR6YJU"
@@ -268,6 +267,22 @@ export default function App() {
         onOpenOrder={() => {}}
         onGuide={() => {}}
       />
+    );
+  }
+  if (preview === "guide") {
+    return (
+      <div className="min-h-svh bg-background text-foreground">
+        <GuideScreen onDone={() => {}} onPractice={() => {}} />
+      </div>
+    );
+  }
+  if (preview === "create") {
+    return (
+      <div className="min-h-svh bg-background text-foreground">
+        <SellerCreateScreen
+          onCreate={async () => ({ ref: "EL-7QF2", deliveryCode: "1234", shareUrl: "https://esko/?order=EL-7QF2" })}
+        />
+      </div>
     );
   }
 
