@@ -76,27 +76,27 @@ const STATUS_META: Record<
   { text: string; tone: string; dot: string }
 > = {
   awaiting_deposit: {
-    text: "Awaiting deposit",
+    text: "Not paid yet",
     tone: "text-amber-600 bg-amber-500/12",
     dot: "bg-amber-500",
   },
   funded: {
-    text: "Deposit locked",
+    text: "Paid & protected",
     tone: "text-sky-600 bg-sky-500/12",
     dot: "bg-sky-500",
   },
   shipped: {
-    text: "Shipped",
+    text: "On the way",
     tone: "text-amber-600 bg-amber-500/12",
     dot: "bg-amber-500",
   },
   delivered: {
-    text: "Delivered · refunded",
+    text: "Delivered",
     tone: "text-emerald-600 bg-emerald-500/12",
     dot: "bg-emerald-500",
   },
   no_show: {
-    text: "No-show · seller paid",
+    text: "You kept the deposit",
     tone: "text-rose-600 bg-rose-500/12",
     dot: "bg-rose-500",
   },

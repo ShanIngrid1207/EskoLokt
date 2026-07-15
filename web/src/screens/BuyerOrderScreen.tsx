@@ -42,7 +42,7 @@ export function BuyerOrderScreen({
 
   const handleLockDeposit = async () => {
     setBusy(true);
-    setTxState({ kind: "pending", note: "Locking deposit on Stellar…" });
+    setTxState({ kind: "pending", note: "Setting aside your deposit…" });
     try {
       const { hash } = await onLockDeposit();
       setTxState({ kind: "success", hash });
@@ -76,7 +76,7 @@ export function BuyerOrderScreen({
 
       {/* Stat tiles row */}
       <div className="mt-6 grid grid-cols-2 gap-3">
-        <StatTile label="Deposit" value={`${order.deposit} XLM`} />
+        <StatTile label="Refundable deposit" value={order.deposit} />
         <StatTile label="Item" value={order.itemName} />
       </div>
 
@@ -89,7 +89,7 @@ export function BuyerOrderScreen({
           </div>
         </div>
         <div>
-          <MicroLabel>Deadline</MicroLabel>
+          <MicroLabel>Pay before</MicroLabel>
           <div
             className={`mt-0.5 font-mono text-sm tabular-nums ${
               isExpired ? "text-rose-600" : ""

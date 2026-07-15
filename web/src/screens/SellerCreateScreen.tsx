@@ -122,7 +122,7 @@ export function SellerCreateScreen({
       <ScreenHeader
         crumb="Seller · New order"
         title="Create an order"
-        subtitle="Your buyer locks a small refundable deposit. You're covered if they no-show."
+        subtitle="Your buyer leaves a small refundable deposit. You're covered if they don't show up."
       />
 
       <Card className="mt-6 space-y-4">
@@ -136,7 +136,7 @@ export function SellerCreateScreen({
           />
         </Labelled>
 
-        <Labelled label="Deposit (XLM)">
+        <Labelled label="Refundable deposit">
           <input
             id="seller-deposit"
             value={deposit}
@@ -146,7 +146,7 @@ export function SellerCreateScreen({
           />
         </Labelled>
 
-        <Labelled label="Auto-claim after (minutes)">
+        <Labelled label="Time the buyer has to pay (minutes)">
           <input
             id="seller-deadline-minutes"
             type="number"

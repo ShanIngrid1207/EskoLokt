@@ -21,10 +21,10 @@ type TimelineStep = {
 };
 
 const TIMELINE: TimelineStep[] = [
-  { id: "created", label: "Created" },
-  { id: "awaiting_deposit", label: "Awaiting deposit" },
-  { id: "funded", label: "Deposit locked" },
-  { id: "shipped", label: "Shipped" },
+  { id: "created", label: "Order made" },
+  { id: "awaiting_deposit", label: "Waiting for deposit" },
+  { id: "funded", label: "Paid & protected" },
+  { id: "shipped", label: "On the way" },
   { id: "delivered", label: "Delivered" },
 ];
 
@@ -99,7 +99,7 @@ export function OrderDetailScreen({
 
   const handleClaim = async () => {
     setBusy(true);
-    setTxState({ kind: "pending", note: "Claiming deposit…" });
+    setTxState({ kind: "pending", note: "Collecting the deposit…" });
     try {
       const { hash } = await onClaim();
       setTxState({ kind: "success", hash });
@@ -134,7 +134,7 @@ export function OrderDetailScreen({
           {(order.status === "no_show"
             ? [
                 ...TIMELINE.slice(0, 4),
-                { id: "no_show" as const, label: "No-show" },
+                { id: "no_show" as const, label: "Buyer didn't show" },
               ]
             : TIMELINE
           ).map((step, i) => {
@@ -182,7 +182,7 @@ export function OrderDetailScreen({
       {/* TX hashes */}
       {order.txHashes && order.txHashes.length > 0 && (
         <Card className="mt-3 space-y-2">
-          <MicroLabel>On-chain transactions</MicroLabel>
+          <MicroLabel>Receipts</MicroLabel>
           {order.txHashes.map((tx) => (
             <div key={tx.hash} className="mt-1">
               <span className="text-xs text-muted-foreground">{tx.label}</span>
@@ -247,7 +247,7 @@ export function OrderDetailScreen({
         {role === "seller" && order.status === "shipped" && deadlinePassed && (
           <div className="space-y-2">
             <p className="rounded-lg bg-rose-500/10 px-3 py-2 text-center text-sm text-rose-600">
-              Buyer didn't show — claim your deposit.
+              Your buyer didn't show up — you can collect the deposit.
             </p>
             <Button
               id="seller-claim-btn"
@@ -256,7 +256,7 @@ export function OrderDetailScreen({
               disabled={busy}
               className="border-rose-500/50 text-rose-600 hover:bg-rose-500/5"
             >
-              {busy ? "Claiming…" : "Claim deposit"}
+              {busy ? "Collecting…" : "Collect the deposit"}
             </Button>
           </div>
         )}
@@ -265,8 +265,8 @@ export function OrderDetailScreen({
         {(order.status === "delivered" || order.status === "no_show") && (
           <div className="py-1 text-center text-sm text-muted-foreground">
             {order.status === "delivered"
-              ? "✓ Delivery confirmed — deposit returned to buyer."
-              : "✗ Order closed — deposit collected by seller."}
+              ? "✓ Delivered — the deposit went back to your customer."
+              : "✗ Closed — you kept the deposit to cover your costs."}
           </div>
         )}
       </StickyActionBar>

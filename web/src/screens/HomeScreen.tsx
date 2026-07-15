@@ -26,17 +26,21 @@ export function HomeScreen({
     addr.length > 12 ? `${addr.slice(0, 6)}…${addr.slice(-4)}` : addr;
 
   return (
-    <div className="mx-auto max-w-md px-4 py-8">
+    <div className="mx-auto max-w-md px-4 py-8 md:max-w-5xl md:px-8">
       {/* Header */}
       <header className="border-b border-border/60 pb-5">
-        <h1 className="font-heading text-2xl">EskoLokt</h1>
-        <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
-          {truncate(address)}
+        <h1 className="font-heading text-2xl">Your shop</h1>
+        <div className="mt-1 text-xs text-muted-foreground">
+          Signed in · <span className="font-mono">{truncate(address)}</span>
         </div>
       </header>
 
+      {/* Two columns on desktop: actions on the left, orders on the right. */}
+      <div className="md:mt-8 md:grid md:grid-cols-2 md:items-start md:gap-8">
+        {/* Left column: actions */}
+        <div>
       {/* Quick-action cards */}
-      <div className="mt-6 grid grid-cols-2 gap-3">
+      <div className="mt-6 grid grid-cols-2 gap-3 md:mt-0">
         {/* Sell card */}
         <button
           id="home-sell-btn"
@@ -106,8 +110,9 @@ export function HomeScreen({
         </Card>
       )}
 
-      {/* My orders */}
-      <div className="mt-8">
+        </div>
+        {/* Right column: My orders */}
+        <div className="mt-8 md:mt-0">
         <MicroLabel>My orders</MicroLabel>
 
         {orders.length === 0 ? (
@@ -141,6 +146,7 @@ export function HomeScreen({
             ))}
           </ul>
         )}
+        </div>
       </div>
     </div>
   );
