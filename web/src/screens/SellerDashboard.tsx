@@ -7,6 +7,8 @@
 import { useMemo, useState } from "react";
 import type { OrderView, OrderStatus } from "../lib/types";
 import { StatusPill } from "../ui/primitives";
+import { EditableShopName } from "../ui/EditableShopName";
+import { useShopName } from "../lib/shopName";
 
 type Filter = "all" | "active" | "delivered";
 
@@ -83,6 +85,7 @@ export function SellerDashboard({
 
   const initials = address ? address.slice(0, 2).toUpperCase() : "??";
   const shortAddr = address.length > 12 ? `${address.slice(0, 6)}…${address.slice(-4)}` : address;
+  const { name: shopName } = useShopName(address);
 
   return (
     <div className="grid min-h-svh grid-rows-[56px_1fr] bg-background text-foreground">
@@ -146,7 +149,7 @@ export function SellerDashboard({
               {initials}
             </span>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-medium">Your shop</div>
+              <EditableShopName address={address} className="text-sm font-medium" />
               <div className="truncate font-mono text-[10px] text-muted-foreground">{shortAddr}</div>
             </div>
           </div>
@@ -154,8 +157,8 @@ export function SellerDashboard({
 
         {/* Main */}
         <main className="overflow-y-auto p-6 lg:p-8">
-          <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
-            Your shop / Dashboard
+          <div className="truncate font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+            {shopName} / Dashboard
           </div>
           <h1 className="mt-1 font-heading text-2xl tracking-tight">Dashboard</h1>
 

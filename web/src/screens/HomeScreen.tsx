@@ -4,6 +4,7 @@
 import { useState } from "react";
 import type { OrderView } from "../lib/types";
 import { Button, Card, MicroLabel, ScreenHeader, StatusPill } from "../ui/primitives";
+import { EditableShopName } from "../ui/EditableShopName";
 
 export function HomeScreen({
   address,
@@ -29,7 +30,7 @@ export function HomeScreen({
     <div className="mx-auto max-w-md px-4 py-8 md:max-w-5xl md:px-8">
       {/* Header */}
       <header className="border-b border-border/60 pb-5">
-        <h1 className="font-heading text-2xl">Your shop</h1>
+        <EditableShopName address={address} className="font-heading text-2xl" />
         <div className="mt-1 text-xs text-muted-foreground">
           Signed in · <span className="font-mono">{truncate(address)}</span>
         </div>
