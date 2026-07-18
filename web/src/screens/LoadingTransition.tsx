@@ -9,14 +9,14 @@ import ShapeGrid from "../components/ShapeGrid";
 
 const WORD = "ESKO LOKT";
 const STATUSES = ["Connecting wallet", "Securing your deposit vault", "You're in"];
-const DURATION = 1900; // ms on screen before onDone fires
+const DURATION = 3200; // ms on screen before onDone fires
 
 export function LoadingTransition({ onDone }: { onDone: () => void }) {
   const [status, setStatus] = useState(0);
 
   useEffect(() => {
-    const t1 = setTimeout(() => setStatus(1), 650);
-    const t2 = setTimeout(() => setStatus(2), 1400);
+    const t1 = setTimeout(() => setStatus(1), 1100);
+    const t2 = setTimeout(() => setStatus(2), 2400);
     const done = setTimeout(onDone, DURATION);
     return () => {
       clearTimeout(t1);

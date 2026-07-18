@@ -156,8 +156,14 @@ export default function App() {
     setAddress(a);
     await loadMyOrders(a);
     toast.success("Wallet connected");
-    setRoute((r) => (r === "connect" ? "home" : r));
-    if (!hasSeenGuide()) setTourOpen(true);
+    // From the connect screen, play the branded loading transition before the
+    // dashboard (finishEntering lands on home + opens the tour). Connecting from
+    // elsewhere (e.g. a buyer link) stays put.
+    if (route === "connect") {
+      setEntering(true);
+    } else if (!hasSeenGuide()) {
+      setTourOpen(true);
+    }
   }
 
   async function handleGetTestFunds() {
