@@ -77,7 +77,7 @@ export function LoadingTransition({ onDone }: { onDone: () => void }) {
 
       {/* Center content */}
       <div className="relative flex flex-col items-center">
-        <span className="el-lock flex size-36 items-center justify-center rounded-3xl bg-white/40 p-5 shadow-xl shadow-black/20 backdrop-blur-sm">
+        <span className="el-lock flex size-36 items-center justify-center rounded-3xl bg-white/15 p-5 shadow-xl shadow-black/20 backdrop-blur-sm">
           <img src="/eskolokt-mark.png" alt="EskoLokt" className="size-full object-contain" />
         </span>
 
