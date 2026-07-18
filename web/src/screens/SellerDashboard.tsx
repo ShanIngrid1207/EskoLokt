@@ -103,9 +103,6 @@ export function SellerDashboard({
           >
             <PlusIcon /> New order
           </button>
-          <span className="flex size-8 items-center justify-center rounded-full bg-primary/12 font-mono text-xs text-primary">
-            {initials}
-          </span>
         </div>
       </header>
 
