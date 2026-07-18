@@ -198,12 +198,9 @@ function Step({ n, text }: { n: number; text: string }) {
 function BrandLock({ light }: { light?: boolean }) {
   return (
     <span
-      className={`flex size-7 items-center justify-center rounded-md ${light ? "bg-white/15" : "bg-primary"}`}
+      className={`flex size-7 items-center justify-center rounded-md ${light ? "bg-white p-1" : ""}`}
     >
-      <svg viewBox="0 0 24 24" className="size-4" fill={light ? "#fff" : "#fff"} aria-hidden>
-        <rect x="4" y="10.5" width="16" height="10.5" rx="2.4" />
-        <path d="M7.5 10.5V7.5a4.5 4.5 0 0 1 9 0v3" fill="none" stroke="#fff" strokeWidth="1.9" />
-      </svg>
+      <img src="/eskolokt-mark.png" alt="EskoLokt" className="size-full object-contain" />
     </span>
   );
 }

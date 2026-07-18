@@ -442,7 +442,8 @@ export default function App() {
                 ← Back
               </button>
             ) : (
-              <button onClick={goHome} className="font-heading text-sm tracking-tight">
+              <button onClick={goHome} className="flex items-center gap-2 font-heading text-sm tracking-tight">
+                <img src="/eskolokt-mark.png" alt="" className="size-6 object-contain" />
                 EskoLokt
               </button>
             )}
