@@ -38,6 +38,7 @@ import { OrderDetailScreen } from "./screens/OrderDetailScreen";
 import { PracticeScreen } from "./screens/PracticeScreen";
 import { TourOverlay } from "./screens/TourOverlay";
 import { SellerDashboard } from "./screens/SellerDashboard";
+import { LoadingTransition } from "./screens/LoadingTransition";
 
 type Route = "connect" | "home" | "sell" | "buyOrder" | "detail" | "practice" | "offline";
 
@@ -58,6 +59,7 @@ const PREVIEW_ORDERS: OrderView[] = [
 export default function App() {
   const [address, setAddress] = useState<string | null>(() => wallet.getAddress());
   const [route, setRoute] = useState<Route>("connect");
+  const [entering, setEntering] = useState(false);
   const [order, setOrder] = useState<OrderView | null>(null);
   const [role, setRole] = useState<"buyer" | "seller">("buyer");
   const [myOrders, setMyOrders] = useState<OrderView[]>([]);
@@ -135,8 +137,15 @@ export default function App() {
     if (row) setOrder(rowToView(row));
   }
 
-  // After signing in, land on home; first-timers get the spotlight tour on top.
+  // After signing in, play the branded loading transition, then land on home;
+  // first-timers get the spotlight tour on top.
   function enterApp() {
+    setEntering(true);
+  }
+
+  // Called by LoadingTransition once its animation completes.
+  function finishEntering() {
+    setEntering(false);
     setRoute("home");
     if (!hasSeenGuide()) setTourOpen(true);
   }
@@ -361,6 +370,12 @@ export default function App() {
         />
       </div>
     );
+  }
+
+  // Branded wallet → dashboard handoff. Full-screen overlay; when its animation
+  // finishes it hands off to the home route.
+  if (entering) {
+    return <LoadingTransition onDone={finishEntering} />;
   }
 
   // Connect route is a full-viewport split-card design (no framed shell).
