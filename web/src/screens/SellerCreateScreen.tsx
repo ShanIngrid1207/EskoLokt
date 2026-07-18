@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import QRCode from "qrcode";
 import { Button, Card, MicroLabel, ScreenHeader } from "../ui/primitives";
 import { toast } from "../ui/toast";
-import { fmtPhp } from "../lib/money";
+import { fmtXlm, phpToXlm } from "../lib/money";
 
 type Created = { ref: string; deliveryCode: string; shareUrl: string };
 
@@ -27,7 +27,9 @@ export function SellerCreateScreen({
   onCreate: (input: { itemName: string; deposit: string; deadlineMinutes: number }) => Promise<Created>;
 }) {
   const [itemName, setItemName] = useState("");
-  const [deposit, setDeposit] = useState("0.50");
+  // The seller types the deposit in pesos; we convert to XLM on submit, since the
+  // chain always moves XLM. "3.25" is the peso equivalent of the old 0.50 XLM default.
+  const [php, setPhp] = useState("3.25");
   const [minutes, setMinutes] = useState(1440);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,6 +50,7 @@ export function SellerCreateScreen({
     setBusy(true);
     setError(null);
     try {
+      const deposit = String(phpToXlm(php)); // pesos → XLM (the on-chain amount)
       setDone(await onCreate({ itemName, deposit, deadlineMinutes: minutes }));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
@@ -140,20 +143,23 @@ export function SellerCreateScreen({
           <label className="block">
             <MicroLabel>Refundable deposit</MicroLabel>
             <div className="relative mt-1.5">
+              <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center font-mono text-sm font-medium text-muted-foreground">
+                ₱
+              </span>
               <input
                 id="seller-deposit"
-                value={deposit}
-                onChange={(e) => setDeposit(e.target.value.replace(/[^\d.]/g, ""))}
+                value={php}
+                onChange={(e) => setPhp(e.target.value.replace(/[^\d.]/g, ""))}
                 inputMode="decimal"
-                className="h-11 w-full rounded-lg border border-input bg-background pl-3 pr-16 font-mono text-sm tabular-nums outline-none transition-colors focus:border-ring"
+                className="h-11 w-full rounded-lg border border-input bg-background pl-7 pr-16 font-mono text-sm tabular-nums outline-none transition-colors focus:border-ring"
               />
               <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center font-mono text-xs font-medium text-muted-foreground">
-                XLM
+                PHP
               </span>
             </div>
             <p className="mt-1.5 text-xs text-muted-foreground">
-              About <span className="font-medium text-foreground">{fmtPhp(deposit)}</span> — a small hold that
-              comes back to your buyer on delivery.
+              About <span className="font-medium text-foreground">≈ {fmtXlm(phpToXlm(php))}</span> — a small hold
+              that comes back to your buyer on delivery.
             </p>
           </label>
         </div>

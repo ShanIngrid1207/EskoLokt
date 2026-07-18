@@ -32,3 +32,13 @@ export function fmtPhp(value: string | number): string {
   const n = typeof value === "number" ? value : parseXlm(value);
   return `≈ ${PHP.format(n * XLM_TO_PHP)}`;
 }
+
+/**
+ * Peso amount → XLM, using the display rate above. Used where the buyer/seller
+ * types in pesos but the chain still moves XLM. Rounded to 7 decimals (a stroop,
+ * Stellar's smallest unit) so the value is always chain-representable.
+ */
+export function phpToXlm(value: string | number): number {
+  const n = typeof value === "number" ? value : parseXlm(value);
+  return Number((n / XLM_TO_PHP).toFixed(7));
+}
