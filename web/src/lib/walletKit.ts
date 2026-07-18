@@ -6,7 +6,16 @@ import {
   WalletNetwork,
   allowAllModules,
 } from "@creit.tech/stellar-wallets-kit";
-import { STELLAR_NETWORK_PASSPHRASE } from "./constants";
+import {
+  WalletConnectModule,
+  WalletConnectAllowedMethods,
+} from "@creit.tech/stellar-wallets-kit/modules/walletconnect.module";
+import {
+  STELLAR_NETWORK_PASSPHRASE,
+  WALLETCONNECT_PROJECT_ID,
+  APP_NAME,
+  APP_DESCRIPTION,
+} from "./constants";
 
 const STORAGE_KEY = "eskolokt.wallet.id";
 
@@ -14,9 +23,29 @@ let kit: StellarWalletsKit | null = null;
 
 function getKit(): StellarWalletsKit {
   if (!kit) {
+    const modules = [...allowAllModules()];
+    // Add WalletConnect only when a projectId is configured — the module throws
+    // on init without one. This is what lets mobile wallets connect by QR code.
+    if (WALLETCONNECT_PROJECT_ID) {
+      const origin =
+        typeof window !== "undefined" ? window.location.origin : "https://codlock.app";
+      modules.push(
+        new WalletConnectModule({
+          projectId: WALLETCONNECT_PROJECT_ID,
+          name: APP_NAME,
+          description: APP_DESCRIPTION,
+          url: origin,
+          icons: [`${origin}/icon-192.png`],
+          // We build the XDR and submit to Horizon ourselves, so we only need the
+          // wallet to sign (stellar_signXDR), not sign-and-submit.
+          method: WalletConnectAllowedMethods.SIGN,
+          network: WalletNetwork.TESTNET,
+        }),
+      );
+    }
     kit = new StellarWalletsKit({
       network: WalletNetwork.TESTNET,
-      modules: allowAllModules(),
+      modules,
     });
   }
   return kit;

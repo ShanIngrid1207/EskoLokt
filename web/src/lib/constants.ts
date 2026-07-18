@@ -6,6 +6,18 @@ export const STELLAR_HORIZON_URL = "https://horizon-testnet.stellar.org";
 // Friendbot funds brand-new Testnet accounts with test XLM.
 export const FRIENDBOT_URL = "https://friendbot.stellar.org";
 
+// WalletConnect lets MOBILE wallets (e.g. Freighter Mobile, Lobstr, xBull) connect
+// by QR code / deep link — the phone Freighter app can't be detected by a mobile
+// browser otherwise. Get a FREE projectId at https://cloud.reown.com and set it as
+// VITE_WALLETCONNECT_PROJECT_ID. When this is empty, WalletConnect is simply left
+// out of the picker and desktop browser-extension wallets keep working unchanged.
+export const WALLETCONNECT_PROJECT_ID =
+  (import.meta.env.VITE_WALLETCONNECT_PROJECT_ID as string) || "";
+
+// Shown to the user inside their wallet when approving the connection.
+export const APP_NAME = "CodLock";
+export const APP_DESCRIPTION = "Stellar Testnet escrow demo";
+
 // Build a Testnet explorer link for a transaction hash.
 export const STELLAR_EXPLORER_TX = (hash: string) =>
   `https://stellar.expert/explorer/testnet/tx/${hash}`;
